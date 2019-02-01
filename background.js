@@ -1,7 +1,12 @@
-const createHandler = (initialValue = 0) => {
+const windowDispatcher = (tabEvent) => {
+
+};
+
+
+const tabCounter = (initialValue = 0) => {
   let counter = initialValue;
   return (isRemoved, isDetached) => {
-    browser.tabs.query({currentWindow: true, active: false}).then((tabs) => {
+    browser.tabs.query({}).then((tabs) => {
         if (!isRemoved) {
             counter = tabs.length - 1;
         } else {
@@ -11,18 +16,22 @@ const createHandler = (initialValue = 0) => {
       browser.browserAction.setBadgeText({text: counter.toString()});
       browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
 
-      console.log(tabs);
-      Promise.all(tabs.map(tab => browser.windows.get(tab.windowId))).then(data => console.log(data));
+      const windowIds = new Set(tabs.map(tab => tab.windowId));
+      const windows = [...windowIds].map(windowId => browser.windows.get(windowId));
+      
+      Promise.all(windows).then(data => console.log(tabs, data));
       const tabIdsToDiscard = tabs.map(tab => tab.id);
       browser.tabs.discard(tabIdsToDiscard);
     });
   };
 };
 
-const changeHandler = createHandler();
-changeHandler();
-browser.tabs.onRemoved.addListener(changeHandler.bind(null, true));
-browser.tabs.onCreated.addListener(changeHandler);
-browser.tabs.onActivated.addListener(changeHandler);
-browser.tabs.onAttached.addListener(changeHandler);
-browser.tabs.onDetached.addListener(changeHandler);
+const handlers = {
+    'onRemoved': (tabId, { windowId, isWindowClosing }) => (),
+    'onCreated': (tab) => (),
+    'onActivated': ({ tabId, windowId }) => (),
+    'onAttached': (tabId, { newWindowId, newPosition }) => (),
+    'onDetached': (tabId, { oldWindowId, oldPosition }) => (),
+};
+
+Object.keys(handlers).map(event => browser.tabs[event].addListener(handlers[event]));
