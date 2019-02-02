@@ -1,37 +1,29 @@
-const windowDispatcher = (tabEvent) => {
+const tabSuspender = (tabId, windowId) => {
+  browser.tabs.query({ windowId, active: false }).then((tabs) => {
+    const tabIdsToDiscard = tabs.filter(tab => tab.id !== tabId).map(tab => tab.id);
+    const tabsCount = tabIdsToDiscard.length;
 
+    renderTabCount(tabsCount.toString(), windowId);
+    browser.tabs.discard(tabIdsToDiscard);
+  });   
 };
 
-
-const tabCounter = (initialValue = 0) => {
-  let counter = initialValue;
-  return (isRemoved, isDetached) => {
-    browser.tabs.query({}).then((tabs) => {
-        if (!isRemoved) {
-            counter = tabs.length - 1;
-        } else {
-            counter = tabs.length;
-        }
-      
-      browser.browserAction.setBadgeText({text: counter.toString()});
-      browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
-
-      const windowIds = new Set(tabs.map(tab => tab.windowId));
-      const windows = [...windowIds].map(windowId => browser.windows.get(windowId));
-      
-      Promise.all(windows).then(data => console.log(tabs, data));
-      const tabIdsToDiscard = tabs.map(tab => tab.id);
-      browser.tabs.discard(tabIdsToDiscard);
-    });
-  };
-};
+const renderTabCount = (text, windowId) => {
+  browser.browserAction.setBadgeText({ text, windowId });
+  browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
+}
 
 const handlers = {
-    'onRemoved': (tabId, { windowId, isWindowClosing }) => (),
-    'onCreated': (tab) => (),
-    'onActivated': ({ tabId, windowId }) => (),
-    'onAttached': (tabId, { newWindowId, newPosition }) => (),
-    'onDetached': (tabId, { oldWindowId, oldPosition }) => (),
+    'onRemoved': (tabId, { windowId, isWindowClosing }) => {
+      if (isWindowClosing) {
+        return;
+      }
+      tabSuspender(tabId, windowId)
+    },
+    'onCreated': (tab) => tabSuspender(tab.id, tab.windowId),
+    'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId),
+    'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId),
+    'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId),
 };
 
 Object.keys(handlers).map(event => browser.tabs[event].addListener(handlers[event]));
