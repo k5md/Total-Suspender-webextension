@@ -30,3 +30,5 @@ const handlers = {
 };
 
 Object.keys(handlers).map(event => browser.tabs[event].addListener(handlers[event]));
+
+tabSuspender();
