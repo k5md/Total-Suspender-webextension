@@ -1,10 +1,13 @@
+let removedId;
+
 const tabSuspender = (tabId, windowId) => {
   browser.tabs.query({ windowId, active: false }).then((tabs) => {
-    const tabIdsToDiscard = tabs.filter(tab => tab.id !== tabId).map(tab => tab.id);
+    const tabIds = tabs.map(tab => tab.id);
+    const tabIdsToDiscard = tabIds.filter(tabId => tabId !== removedId);
     const tabsCount = tabIdsToDiscard.length;
 
-    renderTabCount(tabsCount.toString(), windowId);
     browser.tabs.discard(tabIdsToDiscard);
+    renderTabCount(tabsCount.toString(), windowId);
   });   
 };
 
@@ -14,16 +17,16 @@ const renderTabCount = (text, windowId) => {
 }
 
 const handlers = {
-    'onRemoved': (tabId, { windowId, isWindowClosing }) => {
-      if (isWindowClosing) {
-        return;
-      }
-      tabSuspender(tabId, windowId)
-    },
-    'onCreated': (tab) => tabSuspender(tab.id, tab.windowId),
-    'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId),
-    'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId),
-    'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId),
+  'onRemoved': (tabId, { windowId, isWindowClosing }) => {
+    if (!isWindowClosing) tabSuspender(tabId, windowId);
+    // have to keep track of the removed id, if onActivated gets fired next immediately, 
+    // removed id will be in tabs list
+    removedId = tabId; 
+  },
+  'onCreated': (tab) => tabSuspender(tab.id, tab.windowId),
+  'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId),
+  'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId),
+  'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId),
 };
 
 Object.keys(handlers).map(event => browser.tabs[event].addListener(handlers[event]));
