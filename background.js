@@ -16,7 +16,7 @@ const renderTabCount = (text, windowId) => {
   browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
 }
 
-const handlers = {
+const tabHandlers = {
   'onRemoved': (tabId, { windowId, isWindowClosing }) => {
     if (!isWindowClosing) tabSuspender(tabId, windowId);
     // have to keep track of the removed id, if onActivated gets fired next immediately, 
@@ -29,6 +29,7 @@ const handlers = {
   'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId),
 };
 
-Object.keys(handlers).map(event => browser.tabs[event].addListener(handlers[event]));
+Object.keys(tabHandlers).map(event => browser.tabs[event].addListener(tabHandlers[event]));
+
 
 tabSuspender();

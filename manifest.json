@@ -1,7 +1,7 @@
 {
   "applications": {
     "gecko": {
-      "strict_min_version": "58.0a1"
+      "strict_min_version": "62.0"
     }
   },
   "background": {
@@ -9,10 +9,11 @@
   },
   "browser_action": {
     "browser_style": true,
-    "default_title": "Total Suspender"
+    "default_title": "Total Suspender",
+    "default_popup": "totalSuspender.html"
   },
   "description": "Suspends all inactive tabs",
   "manifest_version": 2,
   "name": "Total Suspender",
-  "version": "1.0"
+  "version": "1.1"
 }
