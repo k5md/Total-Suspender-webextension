@@ -5,12 +5,12 @@
     }
   },
   "background": {
-      "scripts": ["src/background.js"]
+      "scripts": ["background.js"]
   },
   "browser_action": {
     "browser_style": true,
     "default_title": "Total Suspender",
-    "default_popup": "src/options/options.html"
+    "default_popup": "options/options.html"
   },
   "permissions": [
     "storage"
