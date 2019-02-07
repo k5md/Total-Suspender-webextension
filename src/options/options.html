@@ -10,14 +10,23 @@
   <header>
     <div>Total Suspender</div>
   </header>
+  
   <section>
     <div>
       <label for="input-suspend">Suspend inactive tabs</label>
       <input type="checkbox" id="input-suspend" unchecked />
     </div>   
     <div>
-      <label for="input-max-active-tabs">Maximum number of active tabs</label>
+      <label for="input-max-active-tabs">Maximum number of inactive tabs</label>
       <input type="text" id="input-max-active-tabs" value="" />
+    </div>
+    <div>
+      <label for="input-delay-suspend">Delay for this many seconds</label>
+      <input type="text" id="input-delay-suspend" value="" />
+    </div>
+    <div>
+      <label for="input-suspend-audible">Suspend tabs producing sound</label>
+      <input type="checkbox" id="input-suspend-audible" checked/>
     </div>
   </section>
 

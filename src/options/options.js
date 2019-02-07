@@ -1,5 +1,3 @@
-const allowOnlyNumbers = str => str.replace(/[^0-9]/g, '');
-
 const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
 
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
@@ -28,10 +26,11 @@ const handleChanges = (elements) => {
 
 const elements = [
   { 
+    //TODO: disable other inputs if this checkbox is unchecked
     id: '#input-suspend',
     valueProperty: 'checked',
     typeCheck: v => typeof v === 'boolean',
-    defaultValue: false,
+    defaultValue: true,
     formatter: v => v,
   },
   {
@@ -39,9 +38,24 @@ const elements = [
     valueProperty: 'value',
     typeCheck: v => typeof v === 'string',
     defaultValue: '0',
-    formatter: allowOnlyNumbers,
+    formatter: str => str.replace(/[^0-9]/g, ''),
+  },
+  {
+    id: '#input-delay-suspend',
+    valueProperty: 'value',
+    typeCheck: v => typeof v === 'string',
+    defaultValue: '60',
+    formatter: str => str.replace(/[^0-9]/g, ''),
+  },
+  { 
+    id: '#input-suspend-audible',
+    valueProperty: 'checked',
+    typeCheck: v => typeof v === 'boolean',
+    defaultValue: false,
+    formatter: v => v,
   },
 ];
+
 
 initialize(elements);
 handleChanges(elements);
