@@ -24,26 +24,19 @@ const handleChanges = (elements) => {
   return nodes;
 }
 
+// TODO: rename typecheck
 const elements = [
-  { 
-    //TODO: disable other inputs if this checkbox is unchecked
-    id: '#input-suspend',
-    valueProperty: 'checked',
-    typeCheck: v => typeof v === 'boolean',
-    defaultValue: true,
-    formatter: v => v,
-  },
   {
     id: '#input-max-active-tabs',
     valueProperty: 'value',
-    typeCheck: v => typeof v === 'string',
-    defaultValue: '0',
+    typeCheck: v => typeof v === 'string' && parseInt(v) > 0,
+    defaultValue: '1',
     formatter: str => str.replace(/[^0-9]/g, ''),
   },
   {
     id: '#input-delay-suspend',
     valueProperty: 'value',
-    typeCheck: v => typeof v === 'string',
+    typeCheck: v => typeof v === 'string' && parseInt(v) > 0,
     defaultValue: '60',
     formatter: str => str.replace(/[^0-9]/g, ''),
   },
@@ -55,7 +48,6 @@ const elements = [
     formatter: v => v,
   },
 ];
-
 
 initialize(elements);
 handleChanges(elements);
