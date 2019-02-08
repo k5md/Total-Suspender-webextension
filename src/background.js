@@ -6,7 +6,7 @@ const tabSuspender = (
   tabId,
   windowId,
   filterFn,
-  action = tabsToDiscard => browser.tabs.discard(tabsToDiscard.map(tab => tab.id)),
+  action,
 ) => {
   browser.tabs.query({ windowId, active: false }).then((tabs) => {
     const tabsToDiscard = filterFn(tabs);
@@ -22,17 +22,17 @@ const renderTabCount = (text, windowId) => {
   browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
 }
 
-const tabHandlers = () => ({
+const tabHandlers = (filterFn, action) => ({
   'onRemoved': (tabId, { windowId, isWindowClosing }) => {
-    if (!isWindowClosing) tabSuspender(tabId, windowId);
+    if (!isWindowClosing) tabSuspender(tabId, windowId, filterFn, action);
     // have to keep track of the removed id, if onActivated gets fired next immediately, 
     // removed id will be in tabs list
     removedId = tabId; 
   },
-  'onCreated': (tab) => tabSuspender(tab.id, tab.windowId),
-  'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId),
-  'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId),
-  'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId),
+  'onCreated': (tab) => tabSuspender(tab.id, tab.windowId, filterFn, action),
+  'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId, filterFn, action),
+  'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId, filterFn, action),
+  'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId, filterFn, action),
 });
 
 // filterFn returns list of tabs that will be discarded,
@@ -41,16 +41,30 @@ const tabHandlers = () => ({
 // TODO: remove duplication, get rid of strings
 const options = [
   {
+    action: fn => tabsToDiscard => {
+      console.log(tabsToDiscard, 'first option');
+      fn(tabsToDiscard)
+    },
+    isEnabled: () => true
+  },
+  {
     id: '#input-max-active-tabs',
     isEnabled: value => !isNaN(parseInt(value)) && parseInt(value) >= 1,
-    action: () => {},
+    action: (fn, value) => {
+      const counter = parseInt(value, 10);
+      return tabsToDiscard => fn([...tabsToDiscard].sort().reverse().slice(counter));
+    },
     defaultValue: '1',
   },
   {
     id: '#input-delay-suspend',
     isEnabled: value => !isNaN(parseInt(value)) && parseInt(value) >= 1,
-    action: fn => () => setTimeout(fn), // when chaining, add checks that tabsToDiscard still exist
-    defaultValue: '60',
+    action: (fn, value) => tabsToDiscard => {
+      // TODO: add checks that tabsToDiscard still exist
+      const ms = parseInt(value) * 1000; // value provided in seconds
+      setTimeout(() => fn(tabsToDiscard), ms)
+    },
+    defaultValue: '1',
   },
   {
     id: '#input-suspend-audible',
@@ -59,8 +73,6 @@ const options = [
     defaultValue: false,
   },
 ];
-
-const defaultFilter = tabs => tabs.filter(tab => tab.id !== removedId);
 
 const initialize = async (options) => {
   const loadedOptions = await Promise.all(options.map(async option => {
@@ -77,14 +89,23 @@ const initialize = async (options) => {
   }));
 
   const activeOptions = loadedOptions.filter(option => option.isEnabled);
-  const mergedFilters = loadedOptions.reduce((acc, cur) => {
+  const defaultFilter = tabs => tabs.filter(tab => tab.id !== removedId);
+  const defaultAction = tabsToDiscard => console.log('default action') || browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
+
+  //applies default, then filters from active options sequentially
+  const mergedFilters = activeOptions.reduce((acc, cur) => {
     return (tabs) =>  typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs);
   }, defaultFilter);
 
-  console.log(activeOptions);
-  //TODO: mergedActions reducer, watch changes in config
-  //Object.keys(tabHandlers).map(event => browser.tabs[event].addListener(tabHandlers[event]));
-  //tabSuspender();
+  const mergedActions = activeOptions.reduce((acc, cur) => {
+    return typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc;
+  }, defaultAction);
+
+  // TODO: watch changes in config
+  const tabHandlersToApply = tabHandlers(mergedFilters, mergedActions);
+
+  Object.keys(tabHandlersToApply).map(event => browser.tabs[event].addListener(tabHandlersToApply[event]));
+  tabSuspender(null, null, mergedFilters, mergedActions);
 };
 
 initialize(options); // see constants
