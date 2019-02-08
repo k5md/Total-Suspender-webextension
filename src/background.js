@@ -42,7 +42,7 @@ const tabHandlers = (filterFn, action) => ({
 const options = [
   {
     action: fn => tabsToDiscard => {
-      console.log(tabsToDiscard, 'first option');
+      console.log(tabsToDiscard, 'last option');
       fn(tabsToDiscard)
     },
     isEnabled: () => true
@@ -64,13 +64,20 @@ const options = [
       const ms = parseInt(value) * 1000; // value provided in seconds
       setTimeout(() => fn(tabsToDiscard), ms)
     },
-    defaultValue: '1',
+    defaultValue: '60',
   },
   {
     id: '#input-suspend-audible',
     isEnabled: value => typeof value === 'boolean' && value,
     filterFn: tabs => tabs.filter(tab => !tab.audible),
     defaultValue: false,
+  },
+  {
+    action: fn => tabsToDiscard => {
+      console.log(tabsToDiscard, 'first option');
+      fn(tabsToDiscard)
+    },
+    isEnabled: () => true
   },
 ];
 
@@ -101,11 +108,15 @@ const initialize = async (options) => {
     return typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc;
   }, defaultAction);
 
-  // TODO: watch changes in config
   const tabHandlersToApply = tabHandlers(mergedFilters, mergedActions);
 
+  //register eventHandlers parametrized with options
   Object.keys(tabHandlersToApply).map(event => browser.tabs[event].addListener(tabHandlersToApply[event]));
+
+  //initial run after eventListeners attached
   tabSuspender(null, null, mergedFilters, mergedActions);
+  
 };
 
 initialize(options); // see constants
+// TODO: consider rewriting using classes or native messaging to handle config change
