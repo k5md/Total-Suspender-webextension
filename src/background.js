@@ -41,11 +41,12 @@ const tabHandlers = (filterFn, action) => ({
 // TODO: remove duplication, get rid of strings
 const options = [
   {
-    action: fn => tabsToDiscard => {
-      console.log(tabsToDiscard, 'last option');
-      fn(tabsToDiscard)
+    id: 'end',
+    action: fn => (tabsToDiscard) => {
+      // console.log(tabsToDiscard, 'last option');
+      fn(tabsToDiscard);
     },
-    isEnabled: () => true
+    isEnabled: () => true,
   },
   {
     id: '#input-max-active-tabs',
@@ -59,10 +60,10 @@ const options = [
   {
     id: '#input-delay-suspend',
     isEnabled: value => !isNaN(parseInt(value)) && parseInt(value) >= 1,
-    action: (fn, value) => tabsToDiscard => {
+    action: (fn, value) => (tabsToDiscard) => {
       // TODO: add checks that tabsToDiscard still exist
       const ms = parseInt(value) * 1000; // value provided in seconds
-      setTimeout(() => fn(tabsToDiscard), ms)
+      setTimeout(() => fn(tabsToDiscard), ms);
     },
     defaultValue: '60',
   },
@@ -73,35 +74,23 @@ const options = [
     defaultValue: false,
   },
   {
-    action: fn => tabsToDiscard => {
-      console.log(tabsToDiscard, 'first option');
-      fn(tabsToDiscard)
+    id: 'begin',
+    action: fn => (tabsToDiscard) => {
+      // console.log(tabsToDiscard, 'first option');
+      fn(tabsToDiscard);
     },
-    isEnabled: () => true
+    isEnabled: () => true,
   },
 ];
 
-const initialize = async (options) => {
-  const loadedOptions = await Promise.all(options.map(async option => {
-    const loadedValue = (await loadFromStorage(option.id))[option.id];
-    const value = loadedValue || option.defaultValue;
-    const isEnabled = option.isEnabled(value);
-
-    return { 
-      action: option.action, 
-      filterFn: option.filterFn,
-      value,
-      isEnabled
-    };
-  }));
-
-  const activeOptions = loadedOptions.filter(option => option.isEnabled);
+const run = async (options) => {
+  const activeOptions = options.filter(option => option.isEnabled(option.value));
   const defaultFilter = tabs => tabs.filter(tab => tab.id !== removedId);
   const defaultAction = tabsToDiscard => console.log('default action') || browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
 
   //applies default, then filters from active options sequentially
   const mergedFilters = activeOptions.reduce((acc, cur) => {
-    return (tabs) =>  typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs);
+    return tabs => (typeof cur.filterFn === 'function') ? cur.filterFn(acc(tabs)) : acc(tabs);
   }, defaultFilter);
 
   const mergedActions = activeOptions.reduce((acc, cur) => {
@@ -110,13 +99,53 @@ const initialize = async (options) => {
 
   const tabHandlersToApply = tabHandlers(mergedFilters, mergedActions);
 
-  //register eventHandlers parametrized with options
+  // register eventHandlers parametrized with options
   Object.keys(tabHandlersToApply).map(event => browser.tabs[event].addListener(tabHandlersToApply[event]));
 
-  //initial run after eventListeners attached
+  // initial run after eventListeners attached
   tabSuspender(null, null, mergedFilters, mergedActions);
-  
+
+  // watch for changes in config
+  // NOTE: avoid using this in a loop without removing previously attached onChanged listener
+  const handleConfigChanges = (changes, scope) => {
+    if (scope !== 'local') {
+      return;
+    }
+
+    // remove old event listeners
+    Object.keys(tabHandlersToApply).map(event => browser.tabs[event].removeListener(tabHandlersToApply[event]));
+
+    // reattach event listeners with new args from config
+    // basically, this means another call to run function
+    const delta = Object.entries(changes).reduce((acc, [key, value]) => ({ ...acc, [key]: value.newValue }), {});
+    const updatedOptions = options.reduce((acc, option) => {
+      return [...acc, { ...option, value: delta[option.id] }];
+    }, []);
+
+    // TODO: refactor code to remove this ugly hack
+    browser.storage.onChanged.removeListener(handleConfigChanges); 
+    run(updatedOptions);
+  };
+
+  browser.storage.onChanged.addListener(handleConfigChanges);
 };
 
-initialize(options); // see constants
+const initialize = async (options) => {
+  const loadedOptions = await Promise.all(options.map(async option => {
+    const loadedValue = (await loadFromStorage(option.id))[option.id];
+    const value = loadedValue || option.defaultValue;
+
+    return {
+      id: option.id,
+      action: option.action, 
+      filterFn: option.filterFn,
+      value,
+      isEnabled: option.isEnabled
+    };
+  }));
+
+  return loadedOptions;
+}
+
+initialize(options).then(loadedOptions => run(loadedOptions));
 // TODO: consider rewriting using classes or native messaging to handle config change
