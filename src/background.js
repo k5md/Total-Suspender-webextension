@@ -7,32 +7,38 @@ class TabSuspender {
     this.tabs = [];
   }
 
-  static get config() {
+  get config() {
     return [
       {
-        id: 'end',
-        action: fn => (tabsToDiscard) => {
-          console.log(tabsToDiscard, 'last option');
-          fn(tabsToDiscard);
-        },
-        isEnabled: () => true,
-      },
-      /*{
-        id: '#input-max-active-tabs',
-        isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
-        action: (fn, value) => {
-          const counter = parseInt(value, 10);
-          return tabsToDiscard => fn([...tabsToDiscard].sort().reverse().slice(counter));
-        },
-        defaultValue: '1',
-      },*/
-      {
+        // sets timeout for tabsToDiscard if no timeout has been set,
+        // removes the timeout if the tab has been activated
         id: '#input-delay-suspend',
         isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
-        action: (fn, value) => (tabsToDiscard) => {
-          // TODO: add checks that tabsToDiscard still exist
+        action: (fn, value) => (tabsToDiscard, action) => {
           const ms = parseInt(value, 10) * 1000;
-          setTimeout(() => fn(tabsToDiscard), ms);
+          const tabIdx = this.tabs.findIndex(tab => tab.id === action.id); // TODO: add check for removed?
+
+          if (action.actionType === 'activated' && this.tabs[tabIdx].TabSuspenderTimeoutId) {
+            console.log('clearing timeout for', this.tabs[tabIdx]);
+            clearTimeout(this.tabs[tabIdx].TabSuspenderTimeoutId);
+            this.tabs[tabIdx].TabSuspenderTimeoutId = null;
+          }
+
+          if (action.actionType === 'created') {
+            return;
+          }
+
+          this.tabs.filter(tab => tab.id !== action.id).forEach((tab, tabIndex) => {
+            if (!tab.TabSuspenderTimeoutId) {
+              const TabSuspenderTimeoutId = setTimeout(() => {
+                console.log('time is out for tab', tab.id);
+                browser.tabs.discard(tab.id);
+              }, ms);
+
+              this.tabs[tabIndex].TabSuspenderTimeoutId = TabSuspenderTimeoutId;
+            }
+          });
+          // NOTE: no fn call!
         },
         defaultValue: '60', // value provided in seconds
       },
@@ -43,10 +49,11 @@ class TabSuspender {
         defaultValue: false,
       },
       {
-        id: 'begin',
-        action: fn => (tabsToDiscard) => {
-          console.log(tabsToDiscard, 'first option');
-          fn(tabsToDiscard);
+        id: 'default',
+        action: fn => (tabsToDiscard, action) => {
+          console.log('default action');
+          tabsToDiscard.map(tab => browser.tabs.discard(tab.id));
+          fn(tabsToDiscard, action);
         },
         isEnabled: () => true,
       },
@@ -54,7 +61,7 @@ class TabSuspender {
   }
 
   async updateConfig() {
-    const loadedOptions = await Promise.all(TabSuspender.config.map(async (option) => {
+    const loadedOptions = await Promise.all(this.config.map(async (option) => {
       const {
         id,
         action,
@@ -77,22 +84,18 @@ class TabSuspender {
 
     const activeOptions = loadedOptions.filter(option => option.isEnabled(option.value));
 
-    const defaultFilter = tabs => tabs;
-    const defaultAction = tabsToDiscard => browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
-
     // applies default, then filters from active options sequentially
-    const mergedFilters = activeOptions.reduce((acc, cur) => tabs => (typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs)), defaultFilter);
-    const mergedActions = activeOptions.reduce((acc, cur) => (typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc), defaultAction);
+    const mergedFilters = activeOptions.reduce((acc, cur) => tabs => (typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs)), tabs => tabs);
+    const mergedActions = activeOptions.reduceRight((acc, cur) => (typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc), () => {});
 
     this.filter = mergedFilters;
     this.action = mergedActions;
   }
 
-  suspendTabs() {
+  suspendTabs(tabId) {
     browser.tabs.query({ active: false, discarded: false }).then((tabs) => {
       const tabsToDiscard = this.filter(tabs);
-      console.log(this.tabs, tabs, tabsToDiscard);
-      this.action(tabsToDiscard);
+      this.action(tabsToDiscard, tabId);
     });
   }
 
@@ -100,22 +103,23 @@ class TabSuspender {
     // TODO: rework tabHandlers, removed, attach and detach, as well as diff windows NOT working
     const tabHandlers = {
       onRemoved: (tabId, { windowId, isWindowClosing }) => {
-        this.tabs = this.tabs.filter(cur => cur !== tabId);
-        this.suspendTabs();
+        console.log(`tab ${tabId} removed`);
+        this.tabs = this.tabs.filter(cur => cur.id !== tabId);
       },
       onCreated: (tab) => {
-        this.tabs = [...this.tabs, tab.id];
-        this.suspendTabs();
+        console.log(`tab ${tab.id} created`);
+        this.tabs = [...this.tabs, tab];
+        this.suspendTabs({ actionType: 'created', id: tab.id });
       },
       onActivated: ({ tabId, windowId }) => {
-        this.tabs = this.tabs.filter(cur => cur !== tabId);
-        this.suspendTabs();
+        console.log(`tab ${tabId} activated`);
+        this.suspendTabs({ actionType: 'activated', id: tabId });
       },
       onAttached: (tabId, { newWindowId }) => {
-        this.suspendTabs();
+        console.log(`tab ${tabId} attached`);
       },
       onDetached: (tabId, { oldWindowId }) => {
-        this.suspendTabs();
+        console.log(`tab ${tabId} detached`);
       },
     };
 

@@ -29,13 +29,6 @@ const handleChanges = (elements) => {
 // TODO: rename typecheck
 const elements = [
   {
-    id: '#input-max-active-tabs',
-    valueProperty: 'value',
-    typeCheck: v => typeof v === 'string' && parseInt(v, 10) > 0,
-    defaultValue: '1',
-    formatter: str => str.replace(/[^0-9]/g, ''),
-  },
-  {
     id: '#input-delay-suspend',
     valueProperty: 'value',
     typeCheck: v => typeof v === 'string' && parseInt(v, 10) > 0,
