@@ -2,44 +2,39 @@ let removedId;
 
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
-const tabSuspender = (
-  tabId,
-  windowId,
-  filterFn,
-  action,
-) => {
+const renderTabCount = (text, windowId) => {
+  browser.browserAction.setBadgeText({ text, windowId });
+  browser.browserAction.setBadgeBackgroundColor({ color: 'black' });
+};
+
+const tabSuspender = (tabId, windowId, filterFn, action) => {
   browser.tabs.query({ windowId, active: false }).then((tabs) => {
     const tabsToDiscard = filterFn(tabs);
     const tabsCount = tabsToDiscard.length;
 
     action(tabsToDiscard);
     renderTabCount(tabsCount.toString(), windowId);
-  });   
+  });
 };
 
-const renderTabCount = (text, windowId) => {
-  browser.browserAction.setBadgeText({ text, windowId });
-  browser.browserAction.setBadgeBackgroundColor({'color': 'black'});
-}
-
 const tabHandlers = (filterFn, action) => ({
-  'onRemoved': (tabId, { windowId, isWindowClosing }) => {
+  onRemoved: (tabId, { windowId, isWindowClosing }) => {
     if (!isWindowClosing) tabSuspender(tabId, windowId, filterFn, action);
-    // have to keep track of the removed id, if onActivated gets fired next immediately, 
+    // have to keep track of the removed id, if onActivated gets fired next immediately,
     // removed id will be in tabs list
-    removedId = tabId; 
+    removedId = tabId;
   },
-  'onCreated': (tab) => tabSuspender(tab.id, tab.windowId, filterFn, action),
-  'onActivated': ({ tabId, windowId }) => tabSuspender(tabId, windowId, filterFn, action),
-  'onAttached': (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId, filterFn, action),
-  'onDetached': (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId, filterFn, action),
+  onCreated: tab => tabSuspender(tab.id, tab.windowId, filterFn, action),
+  onActivated: ({ tabId, windowId }) => tabSuspender(tabId, windowId, filterFn, action),
+  onAttached: (tabId, { newWindowId }) => tabSuspender(tabId, newWindowId, filterFn, action),
+  onDetached: (tabId, { oldWindowId }) => tabSuspender(tabId, oldWindowId, filterFn, action),
 });
 
 // filterFn returns list of tabs that will be discarded,
 // action wraps other actions, but the chain always ends with tabs.discard
 // options will be chained
 // TODO: remove duplication, get rid of strings
-const options = [
+const acceptedOptions = [
   {
     id: 'end',
     action: fn => (tabsToDiscard) => {
@@ -50,7 +45,7 @@ const options = [
   },
   {
     id: '#input-max-active-tabs',
-    isEnabled: value => !isNaN(parseInt(value)) && parseInt(value) >= 1,
+    isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
     action: (fn, value) => {
       const counter = parseInt(value, 10);
       return tabsToDiscard => fn([...tabsToDiscard].sort().reverse().slice(counter));
@@ -59,13 +54,13 @@ const options = [
   },
   {
     id: '#input-delay-suspend',
-    isEnabled: value => !isNaN(parseInt(value)) && parseInt(value) >= 1,
+    isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
     action: (fn, value) => (tabsToDiscard) => {
       // TODO: add checks that tabsToDiscard still exist
-      const ms = parseInt(value) * 1000; // value provided in seconds
+      const ms = parseInt(value, 10) * 1000;
       setTimeout(() => fn(tabsToDiscard), ms);
     },
-    defaultValue: '60',
+    defaultValue: '60', // value provided in seconds
   },
   {
     id: '#input-suspend-audible',
@@ -86,21 +81,19 @@ const options = [
 const run = async (options) => {
   const activeOptions = options.filter(option => option.isEnabled(option.value));
   const defaultFilter = tabs => tabs.filter(tab => tab.id !== removedId);
-  const defaultAction = tabsToDiscard => console.log('default action') || browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
+  const defaultAction = tabsToDiscard => browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
 
-  //applies default, then filters from active options sequentially
-  const mergedFilters = activeOptions.reduce((acc, cur) => {
-    return tabs => (typeof cur.filterFn === 'function') ? cur.filterFn(acc(tabs)) : acc(tabs);
-  }, defaultFilter);
+  // applies default, then filters from active options sequentially
+  const mergedFilters = activeOptions.reduce((acc, cur) => tabs => (typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs)), defaultFilter);
 
-  const mergedActions = activeOptions.reduce((acc, cur) => {
-    return typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc;
-  }, defaultAction);
+  const mergedActions = activeOptions.reduce((acc, cur) => (typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc), defaultAction);
 
   const tabHandlersToApply = tabHandlers(mergedFilters, mergedActions);
 
   // register eventHandlers parametrized with options
-  Object.keys(tabHandlersToApply).map(event => browser.tabs[event].addListener(tabHandlersToApply[event]));
+  Object.keys(tabHandlersToApply).forEach((event) => {
+    browser.tabs[event].addListener(tabHandlersToApply[event]);
+  });
 
   // initial run after eventListeners attached
   tabSuspender(null, null, mergedFilters, mergedActions);
@@ -113,17 +106,20 @@ const run = async (options) => {
     }
 
     // remove old event listeners
-    Object.keys(tabHandlersToApply).map(event => browser.tabs[event].removeListener(tabHandlersToApply[event]));
+    Object.keys(tabHandlersToApply).forEach((event) => {
+      browser.tabs[event].removeListener(tabHandlersToApply[event]);
+    });
 
     // reattach event listeners with new args from config
     // basically, this means another call to run function
-    const delta = Object.entries(changes).reduce((acc, [key, value]) => ({ ...acc, [key]: value.newValue }), {});
-    const updatedOptions = options.reduce((acc, option) => {
-      return [...acc, { ...option, value: delta[option.id] }];
-    }, []);
+    const delta = Object.entries(changes)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value.newValue }), {});
+
+    const updatedOptions = options
+      .reduce((acc, option) => [...acc, { ...option, value: delta[option.id] }], []);
 
     // TODO: refactor code to remove this ugly hack
-    browser.storage.onChanged.removeListener(handleConfigChanges); 
+    browser.storage.onChanged.removeListener(handleConfigChanges);
     run(updatedOptions);
   };
 
@@ -131,21 +127,29 @@ const run = async (options) => {
 };
 
 const initialize = async (options) => {
-  const loadedOptions = await Promise.all(options.map(async option => {
-    const loadedValue = (await loadFromStorage(option.id))[option.id];
-    const value = loadedValue || option.defaultValue;
+  const loadedOptions = await Promise.all(options.map(async (option) => {
+    const {
+      id,
+      action,
+      filterFn,
+      isEnabled,
+      defaultValue,
+    } = option;
+
+    const loadedValue = (await loadFromStorage(id))[id];
+    const value = loadedValue || defaultValue;
 
     return {
-      id: option.id,
-      action: option.action, 
-      filterFn: option.filterFn,
+      id,
+      action,
+      filterFn,
+      isEnabled,
       value,
-      isEnabled: option.isEnabled
     };
   }));
 
   return loadedOptions;
-}
+};
 
-initialize(options).then(loadedOptions => run(loadedOptions));
+initialize(acceptedOptions).then(loadedOptions => run(loadedOptions));
 // TODO: consider rewriting using classes or native messaging to handle config change
