@@ -43,7 +43,7 @@ const elements = [
     formatter: str => str.replace(/[^0-9]/g, ''),
   },
   {
-    id: '#input-suspend-audible',
+    id: '#input-ignore-audible',
     valueProperty: 'checked',
     typeCheck: v => typeof v === 'boolean',
     defaultValue: false,

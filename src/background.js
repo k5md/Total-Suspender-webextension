@@ -38,7 +38,7 @@ const acceptedOptions = [
   {
     id: 'end',
     action: fn => (tabsToDiscard) => {
-      // console.log(tabsToDiscard, 'last option');
+      console.log(tabsToDiscard, 'last option');
       fn(tabsToDiscard);
     },
     isEnabled: () => true,
@@ -63,7 +63,7 @@ const acceptedOptions = [
     defaultValue: '60', // value provided in seconds
   },
   {
-    id: '#input-suspend-audible',
+    id: '#input-ignore-audible',
     isEnabled: value => typeof value === 'boolean' && value,
     filterFn: tabs => tabs.filter(tab => !tab.audible),
     defaultValue: false,
@@ -71,23 +71,27 @@ const acceptedOptions = [
   {
     id: 'begin',
     action: fn => (tabsToDiscard) => {
-      // console.log(tabsToDiscard, 'first option');
+      console.log(tabsToDiscard, 'first option');
       fn(tabsToDiscard);
     },
     isEnabled: () => true,
   },
 ];
 
-const run = async (options) => {
+const prepareOptions = (options) => {
   const activeOptions = options.filter(option => option.isEnabled(option.value));
+
   const defaultFilter = tabs => tabs.filter(tab => tab.id !== removedId);
   const defaultAction = tabsToDiscard => browser.tabs.discard(tabsToDiscard.map(tab => tab.id));
 
   // applies default, then filters from active options sequentially
   const mergedFilters = activeOptions.reduce((acc, cur) => tabs => (typeof cur.filterFn === 'function' ? cur.filterFn(acc(tabs)) : acc(tabs)), defaultFilter);
-
   const mergedActions = activeOptions.reduce((acc, cur) => (typeof cur.action === 'function' ? cur.action(acc, cur.value) : acc), defaultAction);
+  return [mergedFilters, mergedActions];
+};
 
+const run = (options) => {
+  const [mergedFilters, mergedActions] = prepareOptions(options);
   const tabHandlersToApply = tabHandlers(mergedFilters, mergedActions);
 
   // register eventHandlers parametrized with options
