@@ -48,6 +48,7 @@ class TabSuspender {
           const tabIdx = this.tabs.findIndex(tab => tab.id === action.id);
 
           if (action.actionType === 'activated') {
+            console.log('clearing timeout for', action.id);
             clearTimeout(this.tabs[tabIdx].TabSuspenderTimeoutId);
             this.tabs[tabIdx].TabSuspenderTimeoutId = null;
           }

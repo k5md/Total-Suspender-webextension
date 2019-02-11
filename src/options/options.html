@@ -7,19 +7,26 @@
   </head>
 
 <body>
-  <header>
-    <div>Total Suspender</div>
+  <header class="container">
+    <div class="header_text">Total Suspender</div>
   </header>
 
-  <section>
-    <div>
-      <label for="input-delay-suspend">Suspend inactive tabs after this many seconds</label>
+  <section class="container options">
+    <div class="option">
+      <label for="input-delay-suspend">Suspend after this many seconds:</label>
       <input type="text" id="input-delay-suspend" value="" />
     </div>
-    <div>
-      <label for="input-suspend-audible">Never suspend tabs producing sound</label>
-      <input type="checkbox" id="input-ignore-audible" checked/>
+
+    <div class="option">
+        <div>Ignore tabs producing sound</div>
+        <div class="toggle">
+          <input type="checkbox" class="toggle-checkbox" id="input-ignore-audible">
+          <label class="toggle-label" for="input-ignore-audible">
+            <div class="toggle-inner" data-on-text="ON" data-off-text="OFF" />
+          </label>
+        </div>
     </div>
+
   </section>
 
   <script src="options.js"></script>
