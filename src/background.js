@@ -1,4 +1,7 @@
+/* global bconsole */
+
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
+
 
 class TabSuspender {
   constructor() {
@@ -10,26 +13,26 @@ class TabSuspender {
   // TODO: rework tabHandlers, removed, attach and detach, as well as diff windows NOT working
   get tabHandlers() {
     return {
-      onRemoved: (tabId, { windowId, isWindowClosing }) => {
-        console.log(`tab ${tabId} removed`);
+      onRemoved: (tabId) => {
+        bconsole.log(`tab ${tabId} removed`);
         this.tabs = this.tabs.filter(cur => cur.id !== tabId);
       },
       onCreated: (tab) => {
-        console.log(`tab ${tab.id} created`);
+        bconsole.log(`tab ${tab.id} created`);
         this.tabs = [...this.tabs, tab];
         this.suspendTabs({ actionType: 'created', id: tab.id });
       },
-      onActivated: ({ tabId, windowId }) => {
-        console.log(`tab ${tabId} activated`);
+      onActivated: ({ tabId }) => {
+        bconsole.log(`tab ${tabId} activated`);
         const updatedTabs = this.tabs.map(tab => tab.id === tabId ? {...tab, active: true} : {...tab, active: false});
         this.tabs = updatedTabs;
         this.suspendTabs({ actionType: 'activated', id: tabId });
       },
-      onAttached: (tabId, { newWindowId }) => {
-        console.log(`tab ${tabId} attached`);
+      onAttached: (tabId) => {
+        bconsole.log(`tab ${tabId} attached`);
       },
-      onDetached: (tabId, { oldWindowId }) => {
-        console.log(`tab ${tabId} detached`);
+      onDetached: (tabId) => {
+        bconsole.log(`tab ${tabId} detached`);
       },
     };
   }
@@ -48,18 +51,16 @@ class TabSuspender {
           const tabIdx = this.tabs.findIndex(tab => tab.id === action.id);
 
           if (action.actionType === 'activated') {
-            console.log('clearing timeout for', action.id);
+            bconsole.log('clearing timeout for', action.id);
             clearTimeout(this.tabs[tabIdx].TabSuspenderTimeoutId);
             this.tabs[tabIdx].TabSuspenderTimeoutId = null;
           }
 
-          console.log(this.tabs.filter(tab => (tab.id !== action.id)))
-
           this.tabs.filter(tab => tab.id !== action.id && !tab.active).forEach((tab, tabIndex) => {
             if (!tab.TabSuspenderTimeoutId) {
-              console.log('setting timeout for', tab.id, tab.TabSuspenderTimeoutId);
+              bconsole.log('setting timeout for', tab.id, tab.TabSuspenderTimeoutId);
               const TabSuspenderTimeoutId = setTimeout(() => {
-                console.log('time is out for tab', tab.id);
+                bconsole.log('time is out for tab', tab.id);
                 browser.tabs.discard(tab.id);
                 this.tabs[tabIndex].TabSuspenderTimeoutId = null;
               }, ms);
@@ -80,7 +81,7 @@ class TabSuspender {
       {
         id: 'default',
         action: fn => (tabsToDiscard, action) => {
-          console.log('default action');
+          bconsole.log('default action');
           tabsToDiscard.map(tab => browser.tabs.discard(tab.id));
           fn(tabsToDiscard, action);
         },
