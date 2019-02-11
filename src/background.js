@@ -7,32 +7,60 @@ class TabSuspender {
     this.tabs = [];
   }
 
+  // TODO: rework tabHandlers, removed, attach and detach, as well as diff windows NOT working
+  get tabHandlers() {
+    return {
+      onRemoved: (tabId, { windowId, isWindowClosing }) => {
+        console.log(`tab ${tabId} removed`);
+        this.tabs = this.tabs.filter(cur => cur.id !== tabId);
+      },
+      onCreated: (tab) => {
+        console.log(`tab ${tab.id} created`);
+        this.tabs = [...this.tabs, tab];
+        this.suspendTabs({ actionType: 'created', id: tab.id });
+      },
+      onActivated: ({ tabId, windowId }) => {
+        console.log(`tab ${tabId} activated`);
+        const updatedTabs = this.tabs.map(tab => tab.id === tabId ? {...tab, active: true} : {...tab, active: false});
+        this.tabs = updatedTabs;
+        this.suspendTabs({ actionType: 'activated', id: tabId });
+      },
+      onAttached: (tabId, { newWindowId }) => {
+        console.log(`tab ${tabId} attached`);
+      },
+      onDetached: (tabId, { oldWindowId }) => {
+        console.log(`tab ${tabId} detached`);
+      },
+    };
+  }
+
   get config() {
     return [
       {
-        // sets timeout for tabsToDiscard if no timeout has been set,
-        // removes the timeout if the tab has been activated
         id: '#input-delay-suspend',
         isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
         action: (fn, value) => (tabsToDiscard, action) => {
           const ms = parseInt(value, 10) * 1000;
-          const tabIdx = this.tabs.findIndex(tab => tab.id === action.id); // TODO: add check for removed?
+          // sets timeout for tabsToDiscard if no timeout has been set,
+          // removes the timeout if the tab has been activated
+          // TODO: add check for removed?
+          // TODO: somehow process loading tabs
+          const tabIdx = this.tabs.findIndex(tab => tab.id === action.id);
 
-          if (action.actionType === 'activated' && this.tabs[tabIdx].TabSuspenderTimeoutId) {
-            console.log('clearing timeout for', this.tabs[tabIdx]);
+          if (action.actionType === 'activated') {
             clearTimeout(this.tabs[tabIdx].TabSuspenderTimeoutId);
             this.tabs[tabIdx].TabSuspenderTimeoutId = null;
           }
 
-          if (action.actionType === 'created') {
-            return;
-          }
+          console.log(this.tabs.filter(tab => (tab.id !== action.id)))
 
-          this.tabs.filter(tab => tab.id !== action.id).forEach((tab, tabIndex) => {
+          this.tabs.filter(tab => tab.id !== action.id && !tab.active).forEach((tab, tabIndex) => {
             if (!tab.TabSuspenderTimeoutId) {
+              console.log('setting timeout for', tab.id, tab.TabSuspenderTimeoutId);
               const TabSuspenderTimeoutId = setTimeout(() => {
                 console.log('time is out for tab', tab.id);
                 browser.tabs.discard(tab.id);
+                this.tabs[tabIndex].TabSuspenderTimeoutId = null;
               }, ms);
 
               this.tabs[tabIndex].TabSuspenderTimeoutId = TabSuspenderTimeoutId;
@@ -100,31 +128,8 @@ class TabSuspender {
   }
 
   registerHandlers() {
-    // TODO: rework tabHandlers, removed, attach and detach, as well as diff windows NOT working
-    const tabHandlers = {
-      onRemoved: (tabId, { windowId, isWindowClosing }) => {
-        console.log(`tab ${tabId} removed`);
-        this.tabs = this.tabs.filter(cur => cur.id !== tabId);
-      },
-      onCreated: (tab) => {
-        console.log(`tab ${tab.id} created`);
-        this.tabs = [...this.tabs, tab];
-        this.suspendTabs({ actionType: 'created', id: tab.id });
-      },
-      onActivated: ({ tabId, windowId }) => {
-        console.log(`tab ${tabId} activated`);
-        this.suspendTabs({ actionType: 'activated', id: tabId });
-      },
-      onAttached: (tabId, { newWindowId }) => {
-        console.log(`tab ${tabId} attached`);
-      },
-      onDetached: (tabId, { oldWindowId }) => {
-        console.log(`tab ${tabId} detached`);
-      },
-    };
-
-    // register eventHandlers parametrized with options
-    Object.keys(tabHandlers).forEach(event => browser.tabs[event].addListener(tabHandlers[event]));
+    Object.keys(this.tabHandlers)
+      .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
 
     // reload config after every change
     browser.storage.onChanged.addListener(this.updateConfig);
