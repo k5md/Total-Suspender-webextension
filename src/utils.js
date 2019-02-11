@@ -10,8 +10,7 @@ class Console {
     if (this.level !== 'debug') {
       return;
     }
-    const bodyString = body.join(' ');
-    console.log(`%c${this.title} --- %c${bodyString}`, 'color: red;', 'color: green;');
+    console.log(`%c${this.title} ---`, 'color: red;', ...body);
   }
 }
 

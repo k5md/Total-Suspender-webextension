@@ -24,6 +24,7 @@ class TabSuspender {
       },
       onActivated: ({ tabId }) => {
         bconsole.log(`tab ${tabId} activated`);
+        // FIX: bug with multiple windows and thus multiple active tabs
         const updatedTabs = this.tabs.map(tab => tab.id === tabId ? {...tab, active: true} : {...tab, active: false});
         this.tabs = updatedTabs;
         this.suspendTabs({ actionType: 'activated', id: tabId });
@@ -92,24 +93,9 @@ class TabSuspender {
 
   async updateConfig() {
     const loadedOptions = await Promise.all(this.config.map(async (option) => {
-      const {
-        id,
-        action,
-        filterFn,
-        isEnabled,
-        defaultValue,
-      } = option;
-
-      const loadedValue = (await loadFromStorage(id))[id];
-      const value = loadedValue || defaultValue;
-
-      return {
-        id,
-        action,
-        filterFn,
-        isEnabled,
-        value,
-      };
+      const { id, defaultValue } = option;
+      const value = (await loadFromStorage(id))[id] || defaultValue;
+      return { ...option, value };
     }));
 
     const activeOptions = loadedOptions.filter(option => option.isEnabled(option.value));
@@ -122,10 +108,11 @@ class TabSuspender {
     this.action = mergedActions;
   }
 
-  suspendTabs(tabId) {
-    browser.tabs.query({ active: false, discarded: false }).then((tabs) => {
+  suspendTabs(tabAction) {
+    browser.tabs.query({}).then((tabs) => {
+      bconsole.log(tabs, this.tabs, Object.is(this.tabs, tabs));
       const tabsToDiscard = this.filter(tabs);
-      this.action(tabsToDiscard, tabId);
+      this.action(tabsToDiscard, tabAction);
     });
   }
 
