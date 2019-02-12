@@ -1,12 +1,12 @@
 install:
-    npm install
+	npm install
 
 build:
 	rm -rf dist
 	npm run build
 
 lint:
-    npx eslint .
+	npx eslint .
 
 test:
-    npm test
+	npm test
