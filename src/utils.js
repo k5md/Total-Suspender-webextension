@@ -14,4 +14,4 @@ class Console {
   }
 }
 
-const bconsole = new Console('background', 'debug');
+const bconsole = new Console('background', '');

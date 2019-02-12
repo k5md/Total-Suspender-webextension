@@ -9,7 +9,7 @@ class TabSuspender {
 
   handleAction(actionInfo) {
     browser.tabs.query({}).then((tabs) => {
-      this.action(tabs, actionInfo);
+      this.action(actionInfo)(tabs);
     });
   }
 
@@ -18,49 +18,52 @@ class TabSuspender {
     // modifiedTabs contain tabs changed in preceding actions, return them in actions!
     return [
       {
-        id: 'active',
-        action: () => (rawTabs, modifiedTabs = rawTabs, actionInfo) => {
-          console.log(rawTabs, modifiedTabs, actionInfo);
-          return modifiedTabs.filter(tab => !tab.active)
-        },
+        id: 'default',
+        action: () => () => (raw, modified = raw) => modified
+          .filter(tab => !tab.active && !tab.discarded),
         isEnabled: () => true,
       },
       {
         id: '#input-ignore-audible',
-        action: () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs.filter(tab => !tab.audible),
+        action: () => () => (raw, modified = raw) => modified.filter(tab => !tab.audible),
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
       },
       {
         id: '#input-delay-suspend',
-        action: value => (rawTabs, modifiedTabs = rawTabs) => {
-          bconsole.log('in delay', rawTabs, modifiedTabs);
+        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
           const ms = parseInt(value, 10) * 1000;
 
-          const rest = rawTabs.filter(
-            thisTab => modifiedTabs.findIndex(tabToDiscard => tabToDiscard.id === thisTab.id) === -1,
-          );
+          if (!this.delaySuspendTimeoutIds) {
+            this.delaySuspendTimeoutIds = [];
+          }
 
           // remove the timeout if the tab is not present in filter results
+          const rest = rawTabs
+            .filter(rawTab => modifiedTabs.findIndex(modTab => modTab.id === rawTab.id) === -1);
+
           rest.forEach((tab) => {
-            bconsole.log('clearing timeout for', tab.id);
-            clearTimeout(this.delaySuspendTimeoutIds);
+            if (!this.delaySuspendTimeoutIds[tab.id]) {
+              return;
+            }
+            clearTimeout(this.delaySuspendTimeoutIds[tab.id]);
             this.delaySuspendTimeoutIds[tab.id] = null;
           });
 
-          filtered.forEach((tab) => {
           // TODO: add check for removed?
           // TODO: somehow process loading tabs
-            if (!this.delaySuspendTimeoutIds[tab.id]) {
-              bconsole.log('setting timeout for', tab.id);
-              const delaySuspendTimeoutId = setTimeout(() => {
-                bconsole.log('time is out for tab', tab.id);
-                browser.tabs.discard(tab.id);
-                this.delaySuspendTimeoutIds[tab.id] = null;
-              }, ms);
-
-              this.delaySuspendTimeoutIds[tab.id] = delaySuspendTimeoutId;
+          modifiedTabs.forEach((tab) => {
+            if (this.delaySuspendTimeoutIds[tab.id]) {
+              return;
             }
+            bconsole.log('setting timeout for', tab.id);
+            const delaySuspendTimeoutId = setTimeout(() => {
+              bconsole.log('time is out for tab', tab.id);
+              browser.tabs.discard(tab.id);
+              this.delaySuspendTimeoutIds[tab.id] = null;
+            }, ms);
+
+            this.delaySuspendTimeoutIds[tab.id] = delaySuspendTimeoutId;
           });
         },
         isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
@@ -79,8 +82,11 @@ class TabSuspender {
     const activeOptions = loadedOptions.filter(option => option.isEnabled(option.value));
 
     const mergedActions = activeOptions.reduceRight(
-      (acc, cur) => (rawTabs, modTabs) => acc(rawTabs, cur.action(cur.value)(rawTabs, modTabs)),
-      (rawTabs, modTabs) => rawTabs,
+      (acc, cur) => actionInfo => (rawTabs, modTabs) => {
+        const newModTabs = cur.action(cur.value)(actionInfo)(rawTabs, modTabs);
+        return acc(actionInfo)(rawTabs, newModTabs);
+      },
+      () => rawTabs => rawTabs,
     );
 
     this.action = mergedActions;
@@ -96,18 +102,12 @@ class TabSuspender {
         bconsole.log(`tab ${tabId} activated`);
         this.handleAction({ type: 'activated', id: tabId });
       },
-      onUpdated: (tabId) => {
-        bconsole.log(`tab ${tabId} updated`);
-        this.handleAction({ type: 'updated', id: tabId });
-      },
-      onRemoved: (tabId) => {
-        bconsole.log(`tab ${tabId} removed`);
-      },
-      onAttached: (tabId) => {
-        bconsole.log(`tab ${tabId} attached`);
-      },
-      onDetached: (tabId) => {
-        bconsole.log(`tab ${tabId} detached`);
+      onUpdated: (tabId, change) => {
+        // TODO: change, add args in addListener to listen to specific changes
+        if (change.audible) {
+          bconsole.log(`tab ${tabId} updated`, change);
+          this.handleAction({ type: 'updated', id: tabId });
+        }
       },
     };
   }
