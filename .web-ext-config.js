@@ -4,7 +4,7 @@ module.exports = {
         'totalSuspender.sublime-workspace',
         'totalSuspender.sublime-project',
     ],
-    sourceDir: 'src',
+    sourceDir: './src',
     build: {
         overwriteDest: true,
     },

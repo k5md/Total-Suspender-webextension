@@ -2,5 +2,3 @@
 *.sublime-workspace
 web-ext-artifacts
 node_modules
-package-lock.json
-package.json
