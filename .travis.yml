@@ -8,3 +8,4 @@ sudo: false
 
 script:
 - make lint
+- make test
