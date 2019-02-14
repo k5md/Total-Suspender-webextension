@@ -6,18 +6,10 @@ class TabSuspender {
   constructor() {
     this.action = null;
     this.console = console;
-  }
 
-  handleAction(actionInfo) {
-    browser.tabs.query({}).then((tabs) => {
-      this.action(actionInfo)(tabs);
-    });
-  }
-
-  get config() {
     // NOTE: actions are applied sequentially,
     // modifiedTabs contain tabs changed in preceding actions, return them in actions!
-    return [
+    this.config = [
       {
         id: 'default',
         action: () => () => (raw, modified = raw) => modified
@@ -73,6 +65,12 @@ class TabSuspender {
     ];
   }
 
+  handleAction(actionInfo) {
+    browser.tabs.query({}).then((tabs) => {
+      this.action(actionInfo)(tabs);
+    });
+  }
+
   async updateConfig() {
     const loadedOptions = await Promise.all(this.config.map(async (option) => {
       const { id, defaultValue } = option;
@@ -80,7 +78,11 @@ class TabSuspender {
       return { ...option, value };
     }));
 
-    const activeOptions = loadedOptions.filter(option => option.isEnabled(option.value));
+    this.config = loadedOptions;
+  }
+
+  generateAction() {
+    const activeOptions = this.config.filter(option => option.isEnabled(option.value));
 
     const mergedActions = activeOptions.reduceRight(
       (acc, cur) => actionInfo => (rawTabs, modTabs) => {
@@ -119,14 +121,16 @@ class TabSuspender {
       .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
 
     // reload config after every change
-    browser.storage.onChanged.addListener(this.updateConfig);
+    browser.storage.onChanged.addListener(() => {
+      this.updateConfig();
+      this.generateAction();
+    });
   }
 
   async run() {
     this.updateConfig = this.updateConfig.bind(this);
-    this.registerHandlers = this.registerHandlers.bind(this);
-    this.handleAction = this.handleAction.bind(this);
     await this.updateConfig();
+    this.generateAction();
     this.registerHandlers();
   }
 }
