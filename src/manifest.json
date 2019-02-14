@@ -5,7 +5,7 @@
     }
   },
   "background": {
-      "scripts": ["utils.js", "background.js"]
+      "page": "background/background.html"
   },
   "browser_action": {
     "browser_style": true,

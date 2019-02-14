@@ -1,4 +1,4 @@
-/* eslint no-unused-vars: off, no-console: off */
+/* eslint no-console: off */
 
 class Console {
   constructor(title, level) {
@@ -14,4 +14,4 @@ class Console {
   }
 }
 
-const bconsole = new Console('background', '');
+export default Console;

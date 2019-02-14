@@ -1,7 +1,8 @@
 body {
   box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
   border-radius: 5px;
-  font-family: Arial, serif;
+  font-family: Open Sans, Arial;
+  src:url(../fonts/OpenSans-Light.ttf);
   background-color: #F5F5F5;
 }
 

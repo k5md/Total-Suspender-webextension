@@ -1,10 +1,11 @@
-/* global bconsole */
+/* eslint import/extensions: off */
 
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
 class TabSuspender {
   constructor() {
     this.action = null;
+    this.console = console;
   }
 
   handleAction(actionInfo) {
@@ -56,9 +57,9 @@ class TabSuspender {
             if (this.delaySuspendTimeoutIds[tab.id]) {
               return;
             }
-            bconsole.log('setting timeout for', tab.id);
+            this.console.log('setting timeout for', tab.id);
             const delaySuspendTimeoutId = setTimeout(() => {
-              bconsole.log('time is out for tab', tab.id);
+              this.console.log('time is out for tab', tab.id);
               browser.tabs.discard(tab.id);
               this.delaySuspendTimeoutIds[tab.id] = null;
             }, ms);
@@ -95,17 +96,17 @@ class TabSuspender {
   get tabHandlers() {
     return {
       onCreated: (tab) => {
-        bconsole.log(`tab ${tab.id} created`);
+        this.console.log(`tab ${tab.id} created`);
         this.handleAction({ type: 'created', id: tab.id });
       },
       onActivated: ({ tabId }) => {
-        bconsole.log(`tab ${tabId} activated`);
+        this.console.log(`tab ${tabId} activated`);
         this.handleAction({ type: 'activated', id: tabId });
       },
       onUpdated: (tabId, change) => {
         // TODO: change, add args in addListener to listen to specific changes
         if (change.audible) {
-          bconsole.log(`tab ${tabId} updated`, change);
+          this.console.log(`tab ${tabId} updated`, change);
           this.handleAction({ type: 'updated', id: tabId });
         }
       },
@@ -130,5 +131,4 @@ class TabSuspender {
   }
 }
 
-const tabSuspender = new TabSuspender();
-tabSuspender.run();
+export default TabSuspender;

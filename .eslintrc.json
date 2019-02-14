@@ -1,7 +1,14 @@
 {
-    "extends": "airbnb-base",
+    "extends": [
+        "airbnb-base",
+        "plugin:jest/recommended"
+    ],
+    "plugins": [
+        "jest"
+    ],
     "env": {
         "browser": true,
-        "webextensions": true
+        "webextensions": true,
+        "jest": true
     }
 }
