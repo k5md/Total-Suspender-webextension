@@ -6,7 +6,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "web-ext lint --config .web-ext-config.js",
-    "build": "web-ext build --config .web-ext-config.js"
+    "build": "web-ext build --config .web-ext-config.js",
+    "browser": "web-ext run --config .web-ext-config.js"
   },
   "jest": {
     "setupFiles": [

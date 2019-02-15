@@ -59,10 +59,28 @@ class TabSuspender {
             this.delaySuspendTimeoutIds[tab.id] = delaySuspendTimeoutId;
           });
         },
-        isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 1,
+        isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) > 0,
         defaultValue: '60', // value provided in seconds
       },
     ];
+
+    this.tabHandlers = {
+      onCreated: (tab) => {
+        this.console.log(`tab ${tab.id} created`);
+        this.handleAction({ type: 'created', id: tab.id });
+      },
+      onActivated: ({ tabId }) => {
+        this.console.log(`tab ${tabId} activated`);
+        this.handleAction({ type: 'activated', id: tabId });
+      },
+      onUpdated: (tabId, change) => {
+        // TODO: change, add args in addListener to listen to specific changes
+        if (change.audible) {
+          this.console.log(`tab ${tabId} updated`, change);
+          this.handleAction({ type: 'updated', id: tabId });
+        }
+      },
+    };
   }
 
   handleAction(actionInfo) {
@@ -93,26 +111,6 @@ class TabSuspender {
     );
 
     this.action = mergedActions;
-  }
-
-  get tabHandlers() {
-    return {
-      onCreated: (tab) => {
-        this.console.log(`tab ${tab.id} created`);
-        this.handleAction({ type: 'created', id: tab.id });
-      },
-      onActivated: ({ tabId }) => {
-        this.console.log(`tab ${tabId} activated`);
-        this.handleAction({ type: 'activated', id: tabId });
-      },
-      onUpdated: (tabId, change) => {
-        // TODO: change, add args in addListener to listen to specific changes
-        if (change.audible) {
-          this.console.log(`tab ${tabId} updated`, change);
-          this.handleAction({ type: 'updated', id: tabId });
-        }
-      },
-    };
   }
 
   registerHandlers() {

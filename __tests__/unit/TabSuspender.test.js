@@ -1,57 +1,61 @@
 import TabSuspender from '../../src/background/TabSuspender';
 
-/*describe('constructor', () => {
+//describe('handleAction', () => {
 
-});
 
-describe('handleAction', () => {
-
-*/
 
 describe('updateConfig', () => {
-  it('initialize config with default values if no value is loaded from localStorage', async () => {
+  it('initializes config with default values if no value is loaded from localStorage', async () => {
     const tabSuspender = new TabSuspender();
 
     const configBefore = [
-      {
-        id: 'default',
-      },
-      {
-        id: 'foo',
-        defaultValue: false,
-      },
-      {
-        id: 'bar',
-        defaultValue: 42,
-      },
-      {
-        id: 'baz',
-        defaultValue: null,
-      },
+      { id: 'default' },
+      { id: 'foo', defaultValue: false },
+      { id: 'bar', defaultValue: 42 },
+      { id: 'baz', defaultValue: null },
     ];
 
     const configAfter = [
-      {
-        id: 'default',
-        value: undefined,
-      },
-      {
-        id: 'foo',
-        defaultValue: false,
-        value: false,
-      },
-      {
-        id: 'bar',
-        defaultValue: 42,
-        value: 42,
-      },
-      {
-        id: 'baz',
-        defaultValue: null,
-        value: null,
-      },
+      { id: 'default', value: undefined },
+      { id: 'foo', defaultValue: false, value: false },
+      { id: 'bar', defaultValue: 42, value: 42 },
+      { id: 'baz', defaultValue: null, value: null },
     ];
     tabSuspender.config = configBefore;
+    await tabSuspender.updateConfig();
+
+    expect(tabSuspender.config).toEqual(configAfter);
+  });
+
+  it('initializes config with values loaded from localStorage', async () => {
+    const tabSuspender = new TabSuspender();
+
+    const configBefore = [
+      { id: 'default' },
+      { id: 'foo', defaultValue: false },
+      { id: 'bar', defaultValue: 42 },
+      { id: 'baz', defaultValue: null },
+    ];
+
+    const configAfter = [
+      { id: 'default', value: 42 },
+      { id: 'foo', defaultValue: false, value: 21 },
+      { id: 'bar', defaultValue: 42, value: 11 },
+      { id: 'baz', defaultValue: null, value: null },
+    ];
+
+    const storageBefore = {
+      default: 42,
+      foo: 21,
+      bar: 11,
+    };
+
+    tabSuspender.config = configBefore;
+
+    const storage = browser.storage.local;
+    await storage.clear();
+    await storage.set(storageBefore);
+
     await tabSuspender.updateConfig();
 
     expect(tabSuspender.config).toEqual(configAfter);
@@ -59,7 +63,7 @@ describe('updateConfig', () => {
 });
 
 describe('generateAction', () => {
-  it('set this.action as a merged action of those in config, which isEnabled evaluates to true', () => {
+  it('sets this.action as a merged action of those in config, which isEnabled evaluates to true', () => {
     const foo = jest.fn(() => () => (raw, modified = raw) => modified.filter(item => item > 0));
     const bar = jest.fn(value => () => (raw, modified = raw) => modified.map(() => value));
     const baz = jest.fn(value => () => (raw, modified = raw) => modified.map(item => item + value));
@@ -102,14 +106,11 @@ describe('generateAction', () => {
   });
 });
 
-/*describe('tabHandlers', () => {
+/*describe('registerHandlers', () => {
+  const tabSuspender = new TabSuspender();
+  const events = 
+  tabSuspender.registerHandlers();
 
-});
-
-describe('registerHandlers', () => {
-
-});*/
-
-/*describe('run', () => {
-
+  expect(browser.tabs.onUpdated.addListener).toHaveBeenCalled();
+  expect(browser.storage.onChanged.addListener).toHaveBeenCalled();
 });*/
