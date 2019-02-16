@@ -1,45 +1,69 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
+
 const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
 
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
-const initialize = (elements) => {
-  const nodes = Promise.all(elements.map(async ({
-    id, valueProperty, typeCheck, defaultValue,
-  }) => {
-    const node = document.querySelector(id);
-    const loadedValue = (await loadFromStorage(id))[id]; // storage.<type>.get returns object
-    node[valueProperty] = typeCheck(loadedValue) ? loadedValue : defaultValue;
-    return node;
-  }));
-  return nodes;
-};
+const initialize = elements => Promise.all(elements.map(async ({
+  selector, valueProperty, defaultValue, postLoad, formatter,
+}) => {
+  const node = document.querySelector(selector);
+  const payload = await loadFromStorage(selector);
+  const loadedValue = payload[selector]; // storage.<type>.get returns object
+  const prepared = postLoad(loadedValue, defaultValue);
+  node[valueProperty] = formatter(prepared);
 
-const handleChanges = (elements) => {
-  const nodes = elements.map(({ id, valueProperty, formatter }) => {
-    const node = document.querySelector(id);
-    node.addEventListener('input', async () => {
-      node[valueProperty] = formatter(node[valueProperty]);
-      await saveToStorage(id, node[valueProperty]);
-    });
-    return node;
+  return node;
+}));
+
+const handleChanges = elements => elements.map(({
+  selector, valueProperty, defaultValue, preSave, formatter,
+}) => {
+  const node = document.querySelector(selector);
+  node.addEventListener('input', async () => {
+    node[valueProperty] = formatter(node[valueProperty]);
+    const prepared = preSave(node[valueProperty], defaultValue);
+    await saveToStorage(selector, prepared);
   });
-  return nodes;
-};
 
-// TODO: rename typecheck
+  return node;
+});
+
 const elements = [
   {
-    id: '#input-delay-suspend',
+    selector: '#input-delay-suspend',
     valueProperty: 'value',
-    typeCheck: v => typeof v === 'string' && parseInt(v, 10) > 0,
-    defaultValue: '60',
+    defaultValue: 60,
+    postLoad: (loadedValue, defaultValue) => {
+      const loadedString = loadedValue.toString();
+      const defaultString = defaultValue.toString();
+
+      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) > 0) {
+        return defaultString;
+      }
+      return loadedString;
+    },
+    preSave: (saveValue, defaultValue) => {
+      const saveNumber = parseInt(saveValue, 10);
+
+      if (Number.isNaN(saveNumber)) {
+        return defaultValue;
+      }
+      return saveNumber;
+    },
     formatter: str => str.replace(/[^0-9]/g, ''),
   },
   {
-    id: '#input-ignore-audible',
+    selector: '#input-ignore-audible',
     valueProperty: 'checked',
-    typeCheck: v => typeof v === 'boolean',
-    defaultValue: false,
+    defaultValue: true,
+    postLoad: (loadedValue, defaultValue) => {
+      if (typeof loadedValue !== 'boolean') {
+        return defaultValue;
+      }
+      return loadedValue;
+    },
+    preSave: saveValue => Boolean(saveValue),
     formatter: v => v,
   },
 ];

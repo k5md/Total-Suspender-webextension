@@ -23,7 +23,7 @@ class TabSuspender {
       {
         id: '#input-delay-suspend',
         action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
-          const ms = parseInt(value, 10) * 1000;
+          const ms = value * 1000;
 
           if (!this.delaySuspendTimeoutIds) {
             this.delaySuspendTimeoutIds = [];
@@ -57,8 +57,8 @@ class TabSuspender {
             this.delaySuspendTimeoutIds[tab.id] = delaySuspendTimeoutId;
           });
         },
-        isEnabled: value => !Number.isNaN(parseInt(value, 10)) && parseInt(value, 10) > 0,
-        defaultValue: '60', // value provided in seconds
+        isEnabled: value => !Number.isNaN(value) && value > 0,
+        defaultValue: 60, // value provided in seconds
       },
     ];
 
@@ -94,6 +94,7 @@ class TabSuspender {
       return { ...option, value };
     }));
 
+    this.console.log('config changed', this.config, loadedOptions);
     this.config = loadedOptions;
   }
 
