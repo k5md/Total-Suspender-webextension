@@ -57,7 +57,7 @@ const elements = [
   {
     selector: '#input-ignore-audible',
     valueProperty: 'checked',
-    defaultValue: true,
+    defaultValue: false,
     postLoad: (loadedValue, defaultValue) => {
       if (typeof loadedValue !== 'boolean') {
         return defaultValue;

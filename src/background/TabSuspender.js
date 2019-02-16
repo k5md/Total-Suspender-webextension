@@ -94,13 +94,14 @@ class TabSuspender {
       return { ...option, value };
     }));
 
-    this.console.log('config changed', this.config, loadedOptions);
     this.config = loadedOptions;
+    this.console.log('config changed', this.config);
   }
 
   generateAction() {
     const activeOptions = this.config.filter(option => option.isEnabled(option.value));
 
+    this.console.log('active options', activeOptions, this.config);
     const mergedActions = activeOptions.reduceRight(
       (acc, cur) => actionInfo => (rawTabs, modTabs) => {
         const newModTabs = cur.action(cur.value)(actionInfo)(rawTabs, modTabs);
@@ -118,8 +119,8 @@ class TabSuspender {
       .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
 
     // reload config after every change
-    browser.storage.onChanged.addListener(() => {
-      this.updateConfig();
+    browser.storage.onChanged.addListener(async () => {
+      await this.updateConfig();
       this.generateAction();
     });
   }
