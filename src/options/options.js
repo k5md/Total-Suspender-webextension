@@ -20,6 +20,7 @@ const handleChanges = elements => elements.map(({
   selector, valueProperty, defaultValue, preSave, formatter,
 }) => {
   const node = document.querySelector(selector);
+
   node.addEventListener('input', async () => {
     node[valueProperty] = formatter(node[valueProperty]);
     const prepared = preSave(node[valueProperty], defaultValue);
@@ -35,10 +36,13 @@ const elements = [
     valueProperty: 'value',
     defaultValue: 60,
     postLoad: (loadedValue, defaultValue) => {
-      const loadedString = loadedValue.toString();
       const defaultString = defaultValue.toString();
+      if (!loadedValue) {
+        return defaultString;
+      }
 
-      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) > 0) {
+      const loadedString = loadedValue.toString();
+      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) < 1) {
         return defaultString;
       }
       return loadedString;
@@ -46,10 +50,7 @@ const elements = [
     preSave: (saveValue, defaultValue) => {
       const saveNumber = parseInt(saveValue, 10);
 
-      if (Number.isNaN(saveNumber)) {
-        return defaultValue;
-      }
-      return saveNumber;
+      return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
     },
     formatter: str => str.replace(/[^0-9]/g, ''),
   },
