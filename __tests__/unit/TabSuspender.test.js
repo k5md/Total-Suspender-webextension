@@ -1,9 +1,5 @@
 import TabSuspender from '../../src/background/TabSuspender';
 
-//describe('handleAction', () => {
-
-
-
 describe('updateConfig', () => {
   it('initializes config with default values if no value is loaded from localStorage', async () => {
     const tabSuspender = new TabSuspender();
@@ -100,17 +96,30 @@ describe('generateAction', () => {
     tabSuspender.generateAction();
     tabSuspender.action()(expectedRaw);
 
-    expect(foo.mock.calls.length).toBe(1);
-    expect(bar.mock.calls.length).toBe(0);
-    expect(baz.mock.calls.length).toBe(1);
+    expect(foo).toHaveBeenCalledTimes(1);
+    expect(bar).not.toBeCalled();
+    expect(baz).toHaveBeenCalledTimes(1);
   });
 });
 
-/*describe('registerHandlers', () => {
-  const tabSuspender = new TabSuspender();
-  const events = 
-  tabSuspender.registerHandlers();
+describe('registerHandlers', () => {
+  it('registers eventListeners for tabs and storage', () => {
+    const tabSuspender = new TabSuspender();
 
-  expect(browser.tabs.onUpdated.addListener).toHaveBeenCalled();
-  expect(browser.storage.onChanged.addListener).toHaveBeenCalled();
-});*/
+    // NOTE: workaround, since jest-webextension-mock only has onUpdated event implemented for tabs
+    const events = ['onActivated', 'onCreated', 'onUpdated'];
+    events.forEach((event) => {
+      browser.tabs[event] = ({
+        addListener: jest.fn(),
+        hasListener: jest.fn(),
+        removeListener: jest.fn(),
+      });
+    });
+
+    tabSuspender.registerHandlers();
+    expect(browser.tabs.onUpdated.addListener).toHaveBeenCalledTimes(1);
+    expect(browser.tabs.onActivated.addListener).toHaveBeenCalledTimes(1);
+    expect(browser.tabs.onCreated.addListener).toHaveBeenCalledTimes(1);
+    expect(browser.storage.onChanged.addListener).toHaveBeenCalledTimes(1);
+  });
+});
