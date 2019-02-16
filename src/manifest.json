@@ -11,11 +11,7 @@
     "browser_style": true,
     "default_title": "Total Suspender",
     "default_popup": "options/options.html",
-    "default_icon": {
-      "24": "icons/totalSuspender.svg",
-      "48": "icons/totalSuspender.svg",
-      "96": "icons/totalSuspender.svg"
-    }
+    "default_icon": "icons/cog-window.svg"
   },
   "permissions": [
     "storage"
