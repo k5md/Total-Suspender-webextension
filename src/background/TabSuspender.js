@@ -1,5 +1,3 @@
-/* eslint import/extensions: off */
-
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
 class TabSuspender {

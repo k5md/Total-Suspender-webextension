@@ -3,33 +3,48 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <link rel="stylesheet" href="options.css"/>
   </head>
 
 <body>
-  <header class="container">
-    <div class="header_text">Total Suspender</div>
-  </header>
-
-  <section class="container options">
-    <div class="option">
-      <label for="input-delay-suspend">Suspend after this many seconds:</label>
-      <input type="text" id="input-delay-suspend" value="" />
+  <div class="card border-primary">
+    <div class="card-title bg-primary">
+      <h3 class="card-header font-weight-bold text-center">Total Suspender</h3>
     </div>
-
-    <div class="option">
-        <div>Ignore tabs producing sound</div>
-        <div class="toggle">
-          <input type="checkbox" class="toggle-checkbox" id="input-ignore-audible">
-          <label class="toggle-label" for="input-ignore-audible">
-            <div class="toggle-inner" data-on-text="ON" data-off-text="OFF" />
-          </label>
+    <div class="card-body">
+      <div class="mb-4">
+        <h5>Settings</h5>
+      </div>
+      <div class="ml-4">
+        <div class="input-group d-flex justify-content-between mb-4">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Suspend after this many seconds</span>
+          </div>
+          <input type="text" class="form-control" id="input-delay-suspend">
         </div>
+        <div class="input-group d-flex justify-content-between mb-4">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Ignore tabs producing sound</span>
+          </div>
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-secondary active">
+              <input type="radio" name="options" id="input-ignore-audible" autocomplete="off">
+              On
+            </label>
+            <label class="btn btn-secondary">
+              <input type="radio" name="options" id="option2" autocomplete="off">
+              Off
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
-
-  </section>
+  </div>
 
   <script src="options.js"></script>
 </body>
 
 </html>
+
+
