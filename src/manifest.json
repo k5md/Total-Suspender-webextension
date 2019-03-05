@@ -11,7 +11,7 @@
     "browser_style": true,
     "default_title": "Total Suspender",
     "default_popup": "options/options.html",
-    "default_icon": "icons/cog-window.svg"
+    "default_icon": "icons/iconfinder_shutdown_2639921.svg"
   },
   "permissions": [
     "storage"
@@ -20,5 +20,5 @@
   "homepage_url": "https://github.com/k5md/Total-Suspender-webextension",
   "manifest_version": 2,
   "name": "Total Suspender",
-  "version": "2.3"
+  "version": "2.4"
 }
