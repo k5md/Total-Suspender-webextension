@@ -11,7 +11,7 @@ class TabSuspender {
       {
         id: 'default',
         action: () => () => (raw, modified = raw) => modified
-          .filter(tab => !tab.active && !tab.discarded),
+          .filter(tab => !tab.active && !tab.discarded && !tab.pinned),
         isEnabled: () => true,
       },
       {
