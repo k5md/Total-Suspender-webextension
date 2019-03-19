@@ -117,10 +117,10 @@ const elements = [
     valueProperty: 'value',
     defaultValue: '',
     postLoad: (loadedValue, defaultValue) => {
-      this._whitelistPatterns = (!loadedValue)
-        ? new Set()
-        : new Set(loadedValue);
-      console.log('loaded', loadedValue, this._whitelistPatterns);
+      this._whitelistPatterns = (loadedValue && loadedValue instanceof Set)
+        ? new Set(loadedValue)
+        : new Set();
+      this.console.log('loaded', loadedValue, this._whitelistPatterns);
       const whitelistContainer = document.querySelector('#list-whitelist-container');
       whitelistContainer.innerHTML = '';
       this._whitelistPatterns.forEach((pattern) => {
@@ -128,7 +128,7 @@ const elements = [
         item.classList.add('list-group-item', 'list-group-item-action');
         item.textContent = pattern;
         item.addEventListener('click', async () => {
-          console.log(this._whitelistPatterns);
+          this.console.log(this._whitelistPatterns);
           this._whitelistPatterns.delete(pattern);
           await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
         });
