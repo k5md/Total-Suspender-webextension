@@ -5,5 +5,5 @@ import Console from './utils.js';
 
 const tabSuspender = new TabSuspender();
 
-tabSuspender.console = new Console('TabSuspender', '');
+tabSuspender.console = new Console('TabSuspender', 'debug'); // set second parameter to 'debug' for verbose output
 tabSuspender.run();

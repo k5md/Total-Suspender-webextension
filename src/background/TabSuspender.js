@@ -1,22 +1,72 @@
+/* eslint no-underscore-dangle: 0 */
+
+const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
+
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
 class TabSuspender {
   constructor() {
     this.action = null;
     this.console = console;
+    this.discardEventEmitter = document;
 
     // NOTE: actions are applied sequentially,
     // modifiedTabs contain tabs changed in preceding actions, return them in actions!
     this.config = [
       {
+        id: '#input-disable-suspension',
+        action:
+          () => () => () => ({}), // just return empty modified tabs to prevent any actions
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: false,
+      },
+      {
         id: 'default',
-        action: () => () => (raw, modified = raw) => modified
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs
           .filter(tab => !tab.active && !tab.discarded && !tab.pinned),
         isEnabled: () => true,
       },
       {
         id: '#input-ignore-audible',
-        action: () => () => (raw, modified = raw) => modified.filter(tab => !tab.audible),
+        action:
+          () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs.filter(tab => !tab.audible),
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: false,
+      },
+      {
+        id: '#input-whitelist-pattern',
+        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
+          this._whitelistPatterns = value;
+          return modifiedTabs;
+        },
+        isEnabled: () => true,
+      },
+      {
+        id: '#input-enable-whitelist',
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
+          if (!this._whitelistPatterns) {
+            return modifiedTabs;
+          }
+
+          const whitelistPatterns = [...this._whitelistPatterns];
+
+          return modifiedTabs.filter(
+            tab => whitelistPatterns.findIndex(pattern => tab.url.includes(pattern) !== -1),
+          );
+        },
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: true,
+      },
+      {
+        id: '#input-suspend-planned',
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
+          this.console.log('suspending on planned', modifiedTabs);
+          browser.tabs.discard(modifiedTabs.map(tab => tab.id));
+          // better make action generator accept async functions since this
+          // below can cause unexpected behaviour
+          saveToStorage('#input-suspend-planned', false);
+          return modifiedTabs;
+        },
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
       },
@@ -56,6 +106,8 @@ class TabSuspender {
 
             this.delaySuspendTimeoutIds[tab.id] = delaySuspendTimeoutId;
           });
+
+          return modifiedTabs;
         },
         isEnabled: value => !Number.isNaN(value) && value > 0,
         defaultValue: 60, // value provided in seconds
@@ -64,18 +116,18 @@ class TabSuspender {
 
     this.tabHandlers = {
       onCreated: (tab) => {
-        this.console.log(`tab ${tab.id} created`);
-        this.handleAction({ type: 'created', id: tab.id });
+        const event = new CustomEvent('discard', { detail: { type: 'created', id: tab.id } });
+        this.discardEventEmitter.dispatchEvent(event);
       },
       onActivated: ({ tabId }) => {
-        this.console.log(`tab ${tabId} activated`);
-        this.handleAction({ type: 'activated', id: tabId });
+        const event = new CustomEvent('discard', { detail: { type: 'activated', id: tabId } });
+        this.discardEventEmitter.dispatchEvent(event);
       },
       onUpdated: (tabId, change) => {
         // TODO: change, add args in addListener to listen to specific changes
         if (change.audible) {
-          this.console.log(`tab ${tabId} updated`, change);
-          this.handleAction({ type: 'updated', id: tabId });
+          const event = new CustomEvent('discard', { detail: { type: 'updated', id: tabId } });
+          this.discardEventEmitter.dispatchEvent(event);
         }
       },
     };
@@ -118,10 +170,17 @@ class TabSuspender {
     Object.keys(this.tabHandlers)
       .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
 
+    this.discardEventEmitter.addEventListener('discard', (e) => {
+      this.console.log('event', e.detail.type, e.detail.id);
+      this.handleAction({ type: e.detail.type, id: e.detail.id });
+    }, false);
+
     // reload config after every change
     browser.storage.onChanged.addListener(async () => {
       await this.updateConfig();
       this.generateAction();
+      const event = new CustomEvent('discard', { detail: { type: 'configChange' } });
+      this.discardEventEmitter.dispatchEvent(event);
     });
   }
 

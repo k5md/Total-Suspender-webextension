@@ -9,3 +9,9 @@ input[type="checkbox"] {
 .toggle input[type="checkbox"]:checked + label:after{
   content: attr(data-on-text);
 }
+
+.whitelist_container {
+  max-width: 87vw;
+  max-height: 20vh;
+  overflow-y: auto;
+}

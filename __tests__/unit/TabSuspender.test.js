@@ -1,16 +1,14 @@
 import TabSuspender from '../../src/background/TabSuspender';
 
 describe('updateConfig', () => {
+  const configBefore = [
+    { id: 'default' },
+    { id: 'foo', defaultValue: false },
+    { id: 'bar', defaultValue: 42 },
+    { id: 'baz', defaultValue: null },
+  ];
   it('initializes config with default values if no value is loaded from localStorage', async () => {
     const tabSuspender = new TabSuspender();
-
-    const configBefore = [
-      { id: 'default' },
-      { id: 'foo', defaultValue: false },
-      { id: 'bar', defaultValue: 42 },
-      { id: 'baz', defaultValue: null },
-    ];
-
     const configAfter = [
       { id: 'default', value: undefined },
       { id: 'foo', defaultValue: false, value: false },
@@ -25,14 +23,6 @@ describe('updateConfig', () => {
 
   it('initializes config with values loaded from localStorage', async () => {
     const tabSuspender = new TabSuspender();
-
-    const configBefore = [
-      { id: 'default' },
-      { id: 'foo', defaultValue: false },
-      { id: 'bar', defaultValue: 42 },
-      { id: 'baz', defaultValue: null },
-    ];
-
     const configAfter = [
       { id: 'default', value: 42 },
       { id: 'foo', defaultValue: false, value: 21 },

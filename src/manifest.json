@@ -14,7 +14,8 @@
     "default_icon": "icons/iconfinder_shutdown_2639921.svg"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "description": "Suspends all inactive tabs",
   "homepage_url": "https://github.com/k5md/Total-Suspender-webextension",
