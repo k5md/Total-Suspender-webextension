@@ -51,7 +51,7 @@ class TabSuspender {
           const whitelistPatterns = [...this._whitelistPatterns];
 
           return modifiedTabs.filter(
-            tab => whitelistPatterns.findIndex(pattern => tab.url.includes(pattern) !== -1),
+            tab => whitelistPatterns.findIndex(pattern => tab.url.includes(pattern)) === -1,
           );
         },
         isEnabled: value => typeof value === 'boolean' && value,
