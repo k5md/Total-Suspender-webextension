@@ -9,6 +9,7 @@ A minimalistic web extension for firefox that suspends natively (with tabs.disca
 
 ## Features
 
-- Only one user-permission required (storage, to save configuration)
-- Does (not) discard sound playing tabs
-- Delay discarding
+- Only minimal user-permissions are required (storage to save configuration and tabs for whitelisting)
+- Implements whitelisting feature. You can enter URLs or their parts to the corresponding field and the tabs, which url's contain these patterns will not be discarded. May be useful when reading manuals or browsing tubes.
+- Can ignore tabs playing sound
+- Implements delayed suspend feature
