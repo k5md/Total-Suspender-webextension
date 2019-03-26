@@ -36,7 +36,10 @@ class TabSuspender {
       {
         id: '#input-whitelist-pattern',
         action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
-          this._whitelistPatterns = value;
+          // check for those updating from previous versions
+          // since trying to load value from storage by non-existing key returns empty object
+          this._whitelistPatterns = (value && value instanceof Set) ? value : new Set();
+
           return modifiedTabs;
         },
         isEnabled: () => true,
