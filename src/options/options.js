@@ -113,6 +113,19 @@ const elements = [
     formatter: v => v,
   },
   {
+    selector: '#input-enable-whitelist',
+    valueProperty: 'checked',
+    defaultValue: false,
+    postLoad: (loadedValue, defaultValue) => {
+      if (typeof loadedValue !== 'boolean') {
+        return defaultValue;
+      }
+      return loadedValue;
+    },
+    preSave: saveValue => Boolean(saveValue),
+    formatter: v => v,
+  },
+  {
     selector: '#input-whitelist-pattern',
     valueProperty: 'value',
     defaultValue: '',
@@ -140,6 +153,71 @@ const elements = [
       return this._whitelistPatterns;
     },
     formatter: str => str.trim(),
+  },
+  {
+    selector: '#input-enable-blacklist',
+    valueProperty: 'checked',
+    defaultValue: false,
+    postLoad: (loadedValue, defaultValue) => {
+      if (typeof loadedValue !== 'boolean') {
+        return defaultValue;
+      }
+      return loadedValue;
+    },
+    preSave: saveValue => Boolean(saveValue),
+    formatter: v => v,
+  },
+  {
+    selector: '#input-blacklist-pattern',
+    valueProperty: 'value',
+    defaultValue: '',
+    postLoad: (loadedValue, defaultValue) => {
+      this._blacklistPatterns = (loadedValue && loadedValue instanceof Set)
+        ? loadedValue
+        : new Set();
+
+      const blacklistContainer = document.querySelector('#list-blacklist-container');
+      blacklistContainer.innerHTML = '';
+      this._blacklistPatterns.forEach((pattern) => {
+        const item = document.createElement('button');
+        item.classList.add('list-group-item', 'list-group-item-action');
+        item.textContent = pattern;
+        item.addEventListener('click', async () => {
+          this._blacklistPatterns.delete(pattern);
+          await saveToStorage('#input-blacklist-pattern', this._blacklistPatterns);
+        });
+        blacklistContainer.appendChild(item);
+      });
+      return defaultValue;
+    },
+    preSave: (saveValue) => {
+      this._blacklistPatterns.add(saveValue);
+      return this._blacklistPatterns;
+    },
+    formatter: str => str.trim(),
+  },
+  {
+    selector: '#input-suspend-threshold',
+    valueProperty: 'value',
+    defaultValue: 1,
+    postLoad: (loadedValue, defaultValue) => {
+      const defaultString = defaultValue.toString();
+      if (!loadedValue) {
+        return defaultString;
+      }
+
+      const loadedString = loadedValue.toString();
+      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) < 1) {
+        return defaultString;
+      }
+      return loadedString;
+    },
+    preSave: (saveValue, defaultValue) => {
+      const saveNumber = parseInt(saveValue, 10);
+
+      return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
+    },
+    formatter: str => str.replace(/[^0-9]/g, ''),
   },
 ];
 

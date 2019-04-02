@@ -12,11 +12,12 @@ class TabSuspender {
 
     // NOTE: actions are applied sequentially,
     // modifiedTabs contain tabs changed in preceding actions, return them in actions!
+    // only modifiedTabs are meant to be changed
     this.config = [
       {
         id: '#input-disable-suspension',
         action:
-          () => () => () => ({}), // just return empty modified tabs to prevent any actions
+          () => () => () => [], // just return empty modified tabs to prevent any further actions
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
       },
@@ -25,6 +26,17 @@ class TabSuspender {
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs
           .filter(tab => !tab.active && !tab.discarded && !tab.pinned),
         isEnabled: () => true,
+      },
+      {
+        id: '#input-suspend-threshold',
+        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
+          if (modifiedTabs.length < value) {
+            return [];
+          }
+          return modifiedTabs;
+        },
+        isEnabled: value => !Number.isNaN(value) && value > 0,
+        defaultValue: 1, // number of loaded tabs
       },
       {
         id: '#input-ignore-audible',
@@ -47,7 +59,9 @@ class TabSuspender {
       {
         id: '#input-enable-whitelist',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
-          if (!this._whitelistPatterns) {
+          if (!this._whitelistPatterns
+            || (this._whitelistPatterns instanceof Set && this._whitelistPatterns.size)
+          ) {
             return modifiedTabs;
           }
 
@@ -58,7 +72,36 @@ class TabSuspender {
           );
         },
         isEnabled: value => typeof value === 'boolean' && value,
-        defaultValue: true,
+        defaultValue: false,
+      },
+      {
+        id: '#input-blacklist-pattern',
+        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
+          // check for those updating from previous versions
+          // since trying to load value from storage by non-existing key returns empty object
+          this._blacklistPatterns = (value && value instanceof Set) ? value : new Set();
+
+          return modifiedTabs;
+        },
+        isEnabled: () => true,
+      },
+      {
+        id: '#input-enable-blacklist',
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
+          if (!this._blacklistPatterns
+            || (this._blacklistPatterns instanceof Set && this._blacklistPatterns.size)
+          ) {
+            return modifiedTabs;
+          }
+
+          const blacklistPatterns = [...this._blacklistPatterns];
+
+          return modifiedTabs.filter(
+            tab => blacklistPatterns.findIndex(pattern => tab.url.includes(pattern)) !== -1,
+          );
+        },
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: false,
       },
       {
         id: '#input-suspend-planned',
@@ -115,6 +158,23 @@ class TabSuspender {
         isEnabled: value => !Number.isNaN(value) && value > 0,
         defaultValue: 60, // value provided in seconds
       },
+      {
+        id: 'updateBadgeText',
+        action: () => actionInfo => (rawTabs, modifiedTabs = rawTabs) => {
+          browser.tabs.query({}).then((tabs) => {
+            if (actionInfo.type !== 'activated') {
+              const tabsCount = actionInfo.type === 'removed' ? tabs.length - 1 : tabs.length;
+
+              browser.browserAction.setBadgeText({ text: tabsCount.toString() });
+              browser.browserAction.setBadgeTextColor({ color: [0, 0, 0, 255] });
+              browser.browserAction.setBadgeBackgroundColor({ color: [133, 133, 133, 255] });
+            }
+          });
+
+          return modifiedTabs;
+        },
+        isEnabled: () => true,
+      },
     ];
 
     this.tabHandlers = {
@@ -126,12 +186,24 @@ class TabSuspender {
         const event = new CustomEvent('discard', { detail: { type: 'activated', id: tabId } });
         this.discardEventEmitter.dispatchEvent(event);
       },
+      onRemoved: (tabId) => {
+        const event = new CustomEvent('discard', { detail: { type: 'removed', id: tabId } });
+        this.discardEventEmitter.dispatchEvent(event);
+      },
       onUpdated: (tabId, change) => {
         // TODO: change, add args in addListener to listen to specific changes
         if (change.audible) {
           const event = new CustomEvent('discard', { detail: { type: 'updated', id: tabId } });
           this.discardEventEmitter.dispatchEvent(event);
         }
+      },
+      onAttached: (tabId) => {
+        const event = new CustomEvent('discard', { detail: { type: 'attached', id: tabId } });
+        this.discardEventEmitter.dispatchEvent(event);
+      },
+      onDetached: (tabId) => {
+        const event = new CustomEvent('discard', { detail: { type: 'detached', id: tabId } });
+        this.discardEventEmitter.dispatchEvent(event);
       },
     };
   }

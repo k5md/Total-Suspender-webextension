@@ -8,75 +8,140 @@
   </head>
 
 <body>
-  <div class="card border-primary">
+  <div class="card border-primary options_card">
 
-    <div class="card-title bg-primary">
+    <div class="card-title bg-primary options_card_title">
       <h3 class="card-header font-weight-bold text-center">Total Suspender</h3>
     </div>
 
-    <div class="card-body">
-      <div class="mb-4">
-        <h5>Settings</h5>
+    <div class="card-body options_card_body">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs nav-fill" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" href="#Settings" role="tab" data-toggle="tab">Settings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Actions" aria-controls="profile" role="tab" data-toggle="tab">Actions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Whitelist" aria-controls="messages" role="tab" data-toggle="tab">Whitelist</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#Blacklist" aria-controls="messages" role="tab" data-toggle="tab">Blacklist</a>
+        </li>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content tabs mt-4">
+        <div role="tabpanel" class="tab-pane active" id="Settings">
+          <div class="ml-4">
 
-        <div class="ml-4">
-
-          <div class="input-group d-flex justify-content-between mb-4">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Suspension</span>
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Suspension</span>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="input-disable-suspension" checked>
+                <label class="btn btn-warning" for="input-disable-suspension" data-on-text="Disabled" data-off-text="Enabled" />
+              </div>
             </div>
-            <div class="toggle">
-              <input type="checkbox" id="input-disable-suspension" checked>
-              <label class="btn btn-warning" for="input-disable-suspension" data-on-text="Disabled" data-off-text="Enabled" />
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Suspend after this many seconds</span>
+              </div>
+              <input type="text" class="form-control" id="input-delay-suspend">
+            </div>
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Ignore tabs producing sound</span>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="input-ignore-audible" checked>
+                <label class="btn btn-secondary" for="input-ignore-audible" data-on-text="On" data-off-text="Off" />
+              </div>
+            </div>
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Suspend when tabs count reach</span>
+              </div>
+              <input type="text" class="form-control" id="input-suspend-threshold">
             </div>
           </div>
-
-          <div class="input-group d-flex justify-content-between mb-4">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Suspend after this many seconds</span>
-            </div>
-            <input type="text" class="form-control" id="input-delay-suspend">
-          </div>
-
-          <div class="input-group d-flex justify-content-between mb-4">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Ignore tabs producing sound</span>
-            </div>
-            <div class="toggle">
-              <input type="checkbox" id="input-ignore-audible" checked>
-              <label class="btn btn-secondary" for="input-ignore-audible" data-on-text="On" data-off-text="Off" />
-            </div>
-          </div>
-
         </div>
 
-      </div>
+        <div role="tabpanel" class="tab-pane" id="Actions">
+          <div class="ml-4">
 
-      <div class="mb-4">
-        <h5>Actions</h5>
-        <div class="ml-4">
-          <div class="toggle">
-            <input type="checkbox" id="input-suspend-planned">
-            <label class="btn btn-outline-primary" for="input-suspend-planned" data-off-text="Suspend immediately" data-on-text="Suspending..." />
+            <div class="toggle">
+              <input type="checkbox" id="input-suspend-planned">
+              <label class="btn btn-outline-primary" for="input-suspend-planned" data-off-text="Suspend immediately" data-on-text="Suspending..." />
+            </div>
+
           </div>
         </div>
-      </div>
 
-      <div class="mb-4">
-        <h5>Whitelist</h5>
-        <div class="ml-4">
-          <div class="input-group d-flex justify-content-between mb-4">
-            <div class="input-group-prepend">
-              <span class="input-group-text">URL</span>
+        <div role="tabpanel" class="tab-pane" id="Whitelist">
+          <div class="ml-4">
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Whitelist</span>
+              </div>
+
+              <div class="toggle">
+                <input type="checkbox" id="input-enable-whitelist" checked>
+                <label class="btn btn-secondary" for="input-enable-whitelist" data-on-text="On" data-off-text="Off" />
+              </div>
+
             </div>
-            <input type="text" class="form-control" id="input-whitelist-pattern">
+
+            <div class="mb-4">Tabs with URL's matching patterns from this list will never be suspended</div>
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">URL</span>
+              </div>
+              <input type="text" class="form-control" id="input-whitelist-pattern">
+            </div>
+            <div id="list-whitelist-container" class="container whitelist_container list-group"></div>
+
           </div>
-          <div id="list-whitelist-container" class="container whitelist_container list-group"></div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="Blacklist">
+          <div class="ml-4">
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Blacklist</span>
+              </div>
+
+              <div class="toggle">
+                <input type="checkbox" id="input-enable-blacklist" checked>
+                <label class="btn btn-secondary" for="input-enable-blacklist" data-on-text="On" data-off-text="Off" />
+              </div>
+
+            </div>
+
+            <div class="mb-4">Only tabs with URL's matching patterns from this list will be suspended</div>
+          
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text">URL</span>
+              </div>
+              <input type="text" class="form-control" id="input-blacklist-pattern">
+            </div>
+            <div id="list-blacklist-container" class="container whitelist_container list-group"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script src="options.js"></script>
+  <script src="jquery-3.0.0.min.js"></script>
+  <script src="bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
