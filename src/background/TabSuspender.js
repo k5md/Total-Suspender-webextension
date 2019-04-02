@@ -60,7 +60,7 @@ class TabSuspender {
         id: '#input-enable-whitelist',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
           if (!this._whitelistPatterns
-            || (this._whitelistPatterns instanceof Set && this._whitelistPatterns.size)
+            || (this._whitelistPatterns instanceof Set && !this._whitelistPatterns.size)
           ) {
             return modifiedTabs;
           }
@@ -89,7 +89,7 @@ class TabSuspender {
         id: '#input-enable-blacklist',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
           if (!this._blacklistPatterns
-            || (this._blacklistPatterns instanceof Set && this._blacklistPatterns.size)
+            || (this._blacklistPatterns instanceof Set && !this._blacklistPatterns.size)
           ) {
             return modifiedTabs;
           }
