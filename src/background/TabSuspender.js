@@ -24,7 +24,7 @@ class TabSuspender {
       {
         id: 'default',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs
-          .filter(tab => !tab.active && !tab.discarded && !tab.pinned),
+          .filter(tab => !tab.active && !tab.discarded),
         isEnabled: () => true,
       },
       {
@@ -57,6 +57,13 @@ class TabSuspender {
           () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs.filter(tab => !tab.audible),
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
+      },
+      {
+        id: '#input-ignore-pinned',
+        action:
+          () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs.filter(tab => !tab.pinned),
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: true,
       },
       {
         id: '#input-whitelist-pattern',
@@ -188,6 +195,15 @@ class TabSuspender {
         },
         isEnabled: () => true,
       },
+      {
+        // TODO: better refactor and move it to registerHandlers function
+        id: 'addMenuItemSuspend',
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
+
+          return modifiedTabs;
+        },
+        isEnabled: () => true,
+      },
     ];
 
     this.tabHandlers = {
@@ -277,6 +293,42 @@ class TabSuspender {
     await this.updateConfig();
     this.generateAction();
     this.registerHandlers();
+
+    browser.menus.create({
+      id: 'total-suspender-suspend',
+      title: 'Suspend',
+      contexts: ['tab'],
+    });
+    browser.menus.create({
+      id: 'total-suspender-whitelist',
+      title: 'Whitelist',
+      contexts: ['tab'],
+    });
+    browser.menus.create({
+      id: 'total-suspender-blacklist',
+      title: 'Blacklist',
+      contexts: ['tab'],
+    });
+
+    browser.menus.onClicked.addListener((info, tab) => {
+      if (info.menuItemId === 'total-suspender-suspend') {
+        browser.tabs.discard(tab.id);
+      }
+      if (info.menuItemId === 'total-suspender-whitelist') {
+        if (!this._whitelistPatterns || !(this._whitelistPatterns instanceof Set)) {
+          this._whitelistPatterns = new Set();
+        }
+        this._whitelistPatterns.add(tab.url);
+        saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+      }
+      if (info.menuItemId === 'total-suspender-blacklist') {
+        if (!this._blacklistPatterns || !(this._blacklistPatterns instanceof Set)) {
+          this._blacklistPatterns = new Set();
+        }
+        this._blacklistPatterns.add(tab.url);
+        saveToStorage('#input-blacklist-pattern', this._blacklistPatterns);
+      }
+    });
   }
 }
 

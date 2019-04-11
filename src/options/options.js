@@ -87,6 +87,19 @@ const elements = [
     formatter: v => v,
   },
   {
+    selector: '#input-ignore-pinned',
+    valueProperty: 'checked',
+    defaultValue: true,
+    postLoad: (loadedValue, defaultValue) => {
+      if (typeof loadedValue !== 'boolean') {
+        return defaultValue;
+      }
+      return loadedValue;
+    },
+    preSave: saveValue => Boolean(saveValue),
+    formatter: v => v,
+  },
+  {
     selector: '#input-suspend-planned',
     valueProperty: 'checked',
     defaultValue: false,

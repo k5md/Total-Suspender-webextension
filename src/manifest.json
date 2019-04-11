@@ -15,7 +15,8 @@
   },
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "menus"
   ],
   "icons": {
     "48": "icons/iconfinder_shutdown_2639921.png"

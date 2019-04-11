@@ -65,6 +65,16 @@
 
             <div class="input-group d-flex justify-content-between mb-4">
               <div class="input-group-prepend">
+                <span class="input-group-text">Ignore pinned tabs</span>
+              </div>
+              <div class="toggle">
+                <input type="checkbox" id="input-ignore-pinned" checked>
+                <label class="btn btn-secondary" for="input-ignore-pinned" data-on-text="On" data-off-text="Off" />
+              </div>
+            </div>
+
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="input-group-prepend">
                 <span class="input-group-text">Suspend when the loaded tabs count reaches</span>
               </div>
               <input type="text" class="form-control" id="input-suspend-threshold">
