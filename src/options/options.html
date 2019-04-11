@@ -32,6 +32,7 @@
       </ul>
       <!-- Tab panes -->
       <div class="tab-content tabs mt-4">
+        <!-- Settings -->
         <div role="tabpanel" class="tab-pane active" id="Settings">
           <div class="ml-4">
 
@@ -71,17 +72,26 @@
           </div>
         </div>
 
+        <!-- Actions -->
         <div role="tabpanel" class="tab-pane" id="Actions">
           <div class="ml-4">
-
-            <div class="toggle">
-              <input type="checkbox" id="input-suspend-planned">
-              <label class="btn btn-outline-primary" for="input-suspend-planned" data-off-text="Suspend immediately" data-on-text="Suspending..." />
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="toggle">
+                <input type="checkbox" id="input-suspend-planned">
+                <label class="btn btn-outline-primary" for="input-suspend-planned" data-off-text="Suspend now if criteria match" data-on-text="Suspending..." />
+              </div>
             </div>
 
+            <div class="input-group d-flex justify-content-between mb-4">
+              <div class="toggle">
+                <input type="checkbox" id="input-suspend-all-planned">
+                <label class="btn btn-outline-primary" for="input-suspend-all-planned" data-off-text="Suspend all tabs now" data-on-text="Suspending..." />
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- Whitelist -->
         <div role="tabpanel" class="tab-pane" id="Whitelist">
           <div class="ml-4">
 
@@ -110,6 +120,7 @@
           </div>
         </div>
 
+        <!-- Blacklist -->
         <div role="tabpanel" class="tab-pane" id="Blacklist">
           <div class="ml-4">
             <div class="input-group d-flex justify-content-between mb-4">

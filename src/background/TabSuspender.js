@@ -28,6 +28,19 @@ class TabSuspender {
         isEnabled: () => true,
       },
       {
+        id: '#input-suspend-all-planned',
+        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
+          this.console.log('suspending all on planned', modifiedTabs);
+          browser.tabs.discard(modifiedTabs.map(tab => tab.id));
+          // better make action generator accept async functions since this
+          // below can cause unexpected behaviour
+          saveToStorage('#input-suspend-all-planned', false);
+          return modifiedTabs;
+        },
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: false,
+      },
+      {
         id: '#input-suspend-threshold',
         action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
           if (modifiedTabs.length < value) {

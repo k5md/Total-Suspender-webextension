@@ -100,6 +100,19 @@ const elements = [
     formatter: v => v,
   },
   {
+    selector: '#input-suspend-all-planned',
+    valueProperty: 'checked',
+    defaultValue: false,
+    postLoad: (loadedValue, defaultValue) => {
+      if (typeof loadedValue !== 'boolean') {
+        return defaultValue;
+      }
+      return loadedValue;
+    },
+    preSave: saveValue => Boolean(saveValue),
+    formatter: v => v,
+  },
+  {
     selector: '#input-disable-suspension',
     valueProperty: 'checked',
     defaultValue: false,
