@@ -1,6 +1,6 @@
 {
   "name": "Total-Suspender-webextension",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "A minimalistic web extension for firefox that suspends natively (with tabs.discard) not-active tabs.",
   "scripts": {
     "test": "jest",

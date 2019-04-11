@@ -190,22 +190,13 @@ class TabSuspender {
               browser.browserAction.setBadgeBackgroundColor({ color: [133, 133, 133, 255] });
             }
           });
-
-          return modifiedTabs;
-        },
-        isEnabled: () => true,
-      },
-      {
-        // TODO: better refactor and move it to registerHandlers function
-        id: 'addMenuItemSuspend',
-        action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
-
           return modifiedTabs;
         },
         isEnabled: () => true,
       },
     ];
 
+    // TODO: refactor
     this.tabHandlers = {
       onCreated: (tab) => {
         const event = new CustomEvent('discard', { detail: { type: 'created', id: tab.id } });
@@ -286,24 +277,20 @@ class TabSuspender {
       const event = new CustomEvent('discard', { detail: { type: 'configChange' } });
       this.discardEventEmitter.dispatchEvent(event);
     });
-  }
 
-  async run() {
-    this.updateConfig = this.updateConfig.bind(this);
-    await this.updateConfig();
-    this.generateAction();
-    this.registerHandlers();
-
+    // TODO: refactor, separate creating menus, attaching listener and listener
     browser.menus.create({
       id: 'total-suspender-suspend',
       title: 'Suspend',
       contexts: ['tab'],
     });
+
     browser.menus.create({
       id: 'total-suspender-whitelist',
       title: 'Whitelist',
       contexts: ['tab'],
     });
+
     browser.menus.create({
       id: 'total-suspender-blacklist',
       title: 'Blacklist',
@@ -329,6 +316,13 @@ class TabSuspender {
         saveToStorage('#input-blacklist-pattern', this._blacklistPatterns);
       }
     });
+  }
+
+  async run() {
+    this.updateConfig = this.updateConfig.bind(this);
+    await this.updateConfig();
+    this.generateAction();
+    this.registerHandlers();
   }
 }
 
