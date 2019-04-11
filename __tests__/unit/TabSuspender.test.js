@@ -91,28 +91,3 @@ describe('generateAction', () => {
     expect(baz).toHaveBeenCalledTimes(1);
   });
 });
-
-describe('registerHandlers', () => {
-  it('registers eventListeners for tabs and storage', () => {
-    const tabSuspender = new TabSuspender();
-
-    // NOTE: workaround, since jest-webextension-mock only has onUpdated event implemented for tabs
-    const events = ['onActivated', 'onCreated', 'onUpdated', 'onRemoved', 'onAttached', 'onDetached'];
-    events.forEach((event) => {
-      browser.tabs[event] = ({
-        addListener: jest.fn(),
-        hasListener: jest.fn(),
-        removeListener: jest.fn(),
-      });
-    });
-
-    tabSuspender.registerHandlers();
-    expect(browser.tabs.onUpdated.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.tabs.onActivated.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.tabs.onCreated.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.storage.onChanged.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.tabs.onRemoved.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.tabs.onAttached.addListener).toHaveBeenCalledTimes(1);
-    expect(browser.tabs.onDetached.addListener).toHaveBeenCalledTimes(1);
-  });
-});
