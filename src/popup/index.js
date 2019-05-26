@@ -1,6 +1,10 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 /* eslint no-underscore-dangle: 0 */
 
+import 'bootstrap';
+import './index.scss';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
 const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
 
 const loadFromStorage = (key = null) => browser.storage.local.get(key);
@@ -49,107 +53,72 @@ const subscribeToUpdates = (elements) => {
   });
 };
 
+const checkbox = {
+  valueProperty: 'checked',
+  defaultValue: false,
+  postLoad: (loadedValue, defaultValue) => {
+    if (typeof loadedValue !== 'boolean') {
+      return defaultValue;
+    }
+    return loadedValue;
+  },
+  preSave: saveValue => Boolean(saveValue),
+  formatter: v => v,
+};
+
+const numericTextInput = {
+  valueProperty: 'value',
+  defaultValue: 1,
+  postLoad: (loadedValue, defaultValue) => {
+    const defaultString = defaultValue.toString();
+    if (!loadedValue) {
+      return defaultString;
+    }
+
+    const loadedString = loadedValue.toString();
+    if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) < 1) {
+      return defaultString;
+    }
+    return loadedString;
+  },
+  preSave: (saveValue, defaultValue) => {
+    const saveNumber = parseInt(saveValue, 10);
+
+    return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
+  },
+  formatter: str => str.replace(/[^0-9]/g, ''),
+};
+
 const elements = [
   {
     selector: '#input-delay-suspend',
-    valueProperty: 'value',
+    ...numericTextInput,
     defaultValue: 60,
-    postLoad: (loadedValue, defaultValue) => {
-      const defaultString = defaultValue.toString();
-      if (!loadedValue) {
-        return defaultString;
-      }
-
-      const loadedString = loadedValue.toString();
-      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) < 1) {
-        return defaultString;
-      }
-      return loadedString;
-    },
-    preSave: (saveValue, defaultValue) => {
-      const saveNumber = parseInt(saveValue, 10);
-
-      return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
-    },
-    formatter: str => str.replace(/[^0-9]/g, ''),
   },
   {
     selector: '#input-ignore-audible',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-ignore-pinned',
-    valueProperty: 'checked',
+    ...checkbox,
     defaultValue: true,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
   },
   {
     selector: '#input-suspend-planned',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-suspend-all-planned',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-disable-suspension',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-enable-whitelist',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-whitelist-pattern',
@@ -160,16 +129,83 @@ const elements = [
         ? loadedValue
         : new Set();
 
+      this._whitelistEditing = null;
+
       const whitelistContainer = document.querySelector('#list-whitelist-container');
       whitelistContainer.innerHTML = '';
-      this._whitelistPatterns.forEach((pattern) => {
-        const item = document.createElement('button');
+
+      const handleConfirm = (pattern, editField) => async () => {
+        this._whitelistPatterns.delete(pattern);
+        this._whitelistPatterns.add(editField.value);
+        await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+        this._whitelistEditing = null;
+      };
+
+      const handleDelete = pattern => async () => {
+        this._whitelistPatterns.delete(pattern);
+        await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+      };
+
+      const handleEdit = (item, pattern) => async () => {
+        this._whitelistEditing = pattern;
+        document.addEventListener('click', focusLostListener(item));
+      };
+
+      const focusLostListener = item => async (event) => {
+        console.log(event.target, item.children, item.contains(event.target));
+        /* if (!event.target.closest()) {
+          console.log('outside');
+          document.removeEventListener('click', focusLostListener);
+          await handleConfirm(pattern)();
+        } */
+      };
+
+      const editField = document.createElement('input');
+      editField.type = 'text';
+      editField.classList.add('form-control');
+
+      const confirmEditButton = document.createElement('a');
+      confirmEditButton.textContent = 'Confirm';
+      confirmEditButton.classList.add('mx-1');
+
+      const editButton = document.createElement('a');
+      editButton.textContent = 'Edit';
+      editButton.classList.add('mx-1');
+
+      const deleteButton = document.createElement('a');
+      deleteButton.textContent = 'Delete';
+      deleteButton.classList.add('mx-1');
+
+      [...this._whitelistPatterns].sort().forEach((pattern) => {
+        const item = document.createElement('div');
         item.classList.add('list-group-item', 'list-group-item-action');
         item.textContent = pattern;
-        item.addEventListener('click', async () => {
-          this._whitelistPatterns.delete(pattern);
-          await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+        item.addEventListener('mouseenter', () => {
+          if (this._whitelistEditing === pattern) {
+            while (item.firstChild) {
+              item.removeChild(item.firstChild);
+            }
+            item.textContent = '';
+            item.appendChild(editField);
+
+            confirmEditButton.onclick = handleConfirm(pattern, editField);
+            item.appendChild(confirmEditButton);
+          } else {
+            editButton.onclick = handleEdit(item, pattern);
+            item.appendChild(editButton);
+
+            deleteButton.onclick = handleDelete(pattern);
+            item.appendChild(deleteButton);
+          }
         });
+
+        item.addEventListener('mouseleave', () => {
+          while (item.firstChild) {
+            item.removeChild(item.firstChild);
+          }
+          item.textContent = pattern;
+        });
+
         whitelistContainer.appendChild(item);
       });
       return defaultValue;
@@ -182,16 +218,7 @@ const elements = [
   },
   {
     selector: '#input-enable-blacklist',
-    valueProperty: 'checked',
-    defaultValue: false,
-    postLoad: (loadedValue, defaultValue) => {
-      if (typeof loadedValue !== 'boolean') {
-        return defaultValue;
-      }
-      return loadedValue;
-    },
-    preSave: saveValue => Boolean(saveValue),
-    formatter: v => v,
+    ...checkbox,
   },
   {
     selector: '#input-blacklist-pattern',
@@ -224,26 +251,7 @@ const elements = [
   },
   {
     selector: '#input-suspend-threshold',
-    valueProperty: 'value',
-    defaultValue: 1,
-    postLoad: (loadedValue, defaultValue) => {
-      const defaultString = defaultValue.toString();
-      if (!loadedValue) {
-        return defaultString;
-      }
-
-      const loadedString = loadedValue.toString();
-      if (Number.isNaN(loadedValue) || parseInt(loadedString, 10) < 1) {
-        return defaultString;
-      }
-      return loadedString;
-    },
-    preSave: (saveValue, defaultValue) => {
-      const saveNumber = parseInt(saveValue, 10);
-
-      return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
-    },
-    formatter: str => str.replace(/[^0-9]/g, ''),
+    ...numericTextInput,
   },
 ];
 

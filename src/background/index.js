@@ -1,7 +1,7 @@
 /* eslint import/extensions: off */
 
 import TabSuspender from './TabSuspender.js';
-import Console from './utils.js';
+import Console from '../utils.js';
 
 const tabSuspender = new TabSuspender();
 

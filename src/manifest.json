@@ -5,13 +5,13 @@
     }
   },
   "background": {
-      "page": "background/background.html"
+      "page": "{{./background/index.html}}"
   },
   "browser_action": {
     "browser_style": true,
     "default_title": "Total Suspender",
-    "default_popup": "options/options.html",
-    "default_icon": "icons/iconfinder_shutdown_2639921.svg"
+    "default_popup": "{{./popup/index.html}}",
+    "default_icon": "{{./icons/totalSuspender.svg}}"
   },
   "permissions": [
     "storage",
@@ -19,11 +19,15 @@
     "menus"
   ],
   "icons": {
-    "48": "icons/iconfinder_shutdown_2639921.png"
+    "16": "{{./icons/16.png}}",
+    "32": "{{./icons/32.png}}",
+    "48": "{{./icons/48.png}}",
+    "64": "{{./icons/64.png}}",
+    "128": "{{./icons/128.png}}"
   },
-  "description": "Suspends all inactive tabs",
-  "homepage_url": "https://github.com/k5md/Total-Suspender-webextension",
+  "description": "{{prop-loader?description!../package.json}}",
+  "homepage_url": "{{prop-loader?homepage!../package.json}}",
   "manifest_version": 2,
   "name": "Total Suspender",
-  "version": "3.3"
+  "version": "{{prop-loader?version!../package.json}}"
 }

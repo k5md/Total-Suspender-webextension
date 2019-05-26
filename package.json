@@ -2,31 +2,67 @@
   "name": "Total-Suspender-webextension",
   "version": "3.3.0",
   "description": "A minimalistic web extension for firefox that suspends natively (with tabs.discard) not-active tabs.",
+  "homepage": "https://github.com/k5md/Total-Suspender-webextension",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "web-ext lint --config .web-ext-config.js",
-    "build": "web-ext build --config .web-ext-config.js",
-    "browser": "web-ext run --config .web-ext-config.js"
+    "build-dev": "npx rimraf ./dist && npx webpack --config ./webpack.dev.js",
+    "build-prod": "npx rimraf ./dist && npx webpack --config ./webpack.prod.js",
+    "browser": "web-ext run --config .web-ext-config.js",
+    "pack": "npm build-prod && web-ext build --config .web-ext-config.js",
+    "watch": "npm run build-dev && concurrently \"npx webpack --config ./webpack.dev.js --watch\" \"web-ext run --config .web-ext-config.js\""
   },
   "jest": {
     "setupFiles": [
       "jest-webextension-mock"
     ]
   },
-  "author": "",
+  "author": "k5md",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.3.1",
-    "babel-jest": "^24.1.0",
-    "eslint": "^5.13.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jest": "^22.4.1",
+    "autoprefixer": "^9.5.1",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-minify-webpack-plugin": "^0.2.0",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "clean-webpack-plugin": "^0.1.17",
+    "concurrently": "^4.1.0",
+    "css-loader": "^0.28.7",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jest": "^22.6.4",
+    "extract-loader": "^1.0.1",
+    "extract-text-webpack-plugin": "^3.0.1",
+    "extricate-loader": "^2.0.0",
+    "file-loader": "^1.1.5",
+    "html-loader": "^0.5.1",
+    "imports-loader": "^0.7.1",
+    "interpolate-loader": "^2.0.0",
     "jest": "^24.1.0",
     "jest-webextension-mock": "^3.5.0",
-    "web-ext": "^2.9.3"
+    "node-sass": "^4.12.0",
+    "postcss-loader": "^3.0.0",
+    "precss": "^4.0.0",
+    "prop-loader": "^1.0.0",
+    "raw-loader": "^0.5.1",
+    "rimraf": "^2.6.3",
+    "sass-loader": "^7.1.0",
+    "spawn-loader": "^4.0.0",
+    "style-loader": "^0.23.1",
+    "webextension-polyfill": "^0.2.1",
+    "webpack": "^3.7.1",
+    "webpack-merge": "^4.2.1",
+    "webpack-sources": "1.0.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.15.0"
+  }
 }

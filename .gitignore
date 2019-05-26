@@ -2,3 +2,4 @@
 *.sublime-workspace
 web-ext-artifacts
 node_modules
+dist
