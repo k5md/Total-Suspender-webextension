@@ -1,13 +1,10 @@
+import 'bootstrap';
+import './index.scss';
+
 /* eslint no-param-reassign: ["error", { "props": false }] */
 /* eslint no-underscore-dangle: 0 */
 
-import 'bootstrap';
-import './index.scss';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-
-const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
-
-const loadFromStorage = (key = null) => browser.storage.local.get(key);
+import { saveToStorage, loadFromStorage } from '../utils';
 
 const update = elements => Promise.all(elements.map(async ({
   selector, valueProperty, defaultValue, postLoad, formatter,
@@ -89,6 +86,19 @@ const numericTextInput = {
   formatter: str => str.replace(/[^0-9]/g, ''),
 };
 
+const stringTextInput = {
+  valueProperty: 'value',
+  defaultValue: '',
+  postLoad: (loadedValue, defaultValue) => {
+    if (typeof loadedValue !== 'string') {
+      return defaultValue;
+    }
+    return loadedValue;
+  },
+  preSave: saveValue => String(saveValue),
+  formatter: str => str.trim(),
+};
+
 const elements = [
   {
     selector: '#input-delay-suspend',
@@ -122,99 +132,99 @@ const elements = [
   },
   {
     selector: '#input-whitelist-pattern',
-    valueProperty: 'value',
-    defaultValue: '',
+    ...stringTextInput,
     postLoad: (loadedValue, defaultValue) => {
-      this._whitelistPatterns = (loadedValue && loadedValue instanceof Set)
-        ? loadedValue
-        : new Set();
-
       this._whitelistEditing = null;
+      const mount = () => {
+        const editField = document.createElement('input');
+        editField.type = 'text';
+        editField.classList.add('form-control');
 
-      const whitelistContainer = document.querySelector('#list-whitelist-container');
-      whitelistContainer.innerHTML = '';
+        const confirmEditButton = document.createElement('a');
+        confirmEditButton.textContent = 'Confirm';
+        confirmEditButton.classList.add('mx-1');
 
-      const handleConfirm = (pattern, editField) => async () => {
-        this._whitelistPatterns.delete(pattern);
-        this._whitelistPatterns.add(editField.value);
-        await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
-        this._whitelistEditing = null;
-      };
+        const editButton = document.createElement('a');
+        editButton.textContent = 'Edit';
+        editButton.classList.add('mx-1');
 
-      const handleDelete = pattern => async () => {
-        this._whitelistPatterns.delete(pattern);
-        await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
-      };
+        const deleteButton = document.createElement('a');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('mx-1');
 
-      const handleEdit = (item, pattern) => async () => {
-        this._whitelistEditing = pattern;
-        document.addEventListener('click', focusLostListener(item));
-      };
+        const whitelistContainer = document.querySelector('#list-whitelist-container');
+        whitelistContainer.innerHTML = '';
 
-      const focusLostListener = item => async (event) => {
-        console.log(event.target, item.children, item.contains(event.target));
-        /* if (!event.target.closest()) {
-          console.log('outside');
-          document.removeEventListener('click', focusLostListener);
-          await handleConfirm(pattern)();
-        } */
-      };
+        const handleDelete = (item, pattern) => async () => {
+          this._whitelistPatterns.delete(pattern);
+          await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+        };
 
-      const editField = document.createElement('input');
-      editField.type = 'text';
-      editField.classList.add('form-control');
+        const handleEdit = (item, pattern) => async () => {
+          this._whitelistEditing = pattern;
+          mount();
+        };
 
-      const confirmEditButton = document.createElement('a');
-      confirmEditButton.textContent = 'Confirm';
-      confirmEditButton.classList.add('mx-1');
+        const handleConfirm = (item, pattern) => async () => {
+          this._whitelistPatterns.delete(pattern);
+          this._whitelistPatterns.add(editField.value);
+          await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+          this._whitelistEditing = null;
+        };
 
-      const editButton = document.createElement('a');
-      editButton.textContent = 'Edit';
-      editButton.classList.add('mx-1');
-
-      const deleteButton = document.createElement('a');
-      deleteButton.textContent = 'Delete';
-      deleteButton.classList.add('mx-1');
-
-      [...this._whitelistPatterns].sort().forEach((pattern) => {
-        const item = document.createElement('div');
-        item.classList.add('list-group-item', 'list-group-item-action');
-        item.textContent = pattern;
-        item.addEventListener('mouseenter', () => {
+        const handleMouseEnter = (item, pattern) => () => {
           if (this._whitelistEditing === pattern) {
             while (item.firstChild) {
               item.removeChild(item.firstChild);
             }
             item.textContent = '';
+
+            editField.value = pattern;
             item.appendChild(editField);
 
-            confirmEditButton.onclick = handleConfirm(pattern, editField);
+            confirmEditButton.onclick = handleConfirm(item, pattern);
             item.appendChild(confirmEditButton);
           } else {
             editButton.onclick = handleEdit(item, pattern);
             item.appendChild(editButton);
 
-            deleteButton.onclick = handleDelete(pattern);
+            deleteButton.onclick = handleDelete(item, pattern);
             item.appendChild(deleteButton);
           }
-        });
+        };
 
-        item.addEventListener('mouseleave', () => {
-          while (item.firstChild) {
-            item.removeChild(item.firstChild);
+        const handleMouseLeave = (item, pattern) => () => {
+          if (this._whitelistEditing !== pattern) {
+            while (item.firstChild) {
+              item.removeChild(item.firstChild);
+            }
+            item.textContent = pattern;
           }
-          item.textContent = pattern;
-        });
+        };
 
-        whitelistContainer.appendChild(item);
-      });
+        this._whitelistPatterns = (loadedValue && loadedValue instanceof Set)
+          ? loadedValue
+          : new Set();
+
+        [...this._whitelistPatterns].sort().forEach((pattern) => {
+          const item = document.createElement('div');
+          item.classList.add('list-group-item', 'list-group-item-action');
+          item.textContent = pattern;
+
+          item.onmouseenter = handleMouseEnter(item, pattern);
+          item.onmouseleave = handleMouseLeave(item, pattern);
+
+          whitelistContainer.appendChild(item);
+        });
+      };
+
+      mount.bind(this)();
       return defaultValue;
     },
     preSave: (saveValue) => {
       this._whitelistPatterns.add(saveValue);
       return this._whitelistPatterns;
     },
-    formatter: str => str.trim(),
   },
   {
     selector: '#input-enable-blacklist',
@@ -222,32 +232,99 @@ const elements = [
   },
   {
     selector: '#input-blacklist-pattern',
-    valueProperty: 'value',
-    defaultValue: '',
+    ...stringTextInput,
     postLoad: (loadedValue, defaultValue) => {
-      this._blacklistPatterns = (loadedValue && loadedValue instanceof Set)
-        ? loadedValue
-        : new Set();
+      this._blacklistEditing = null;
+      const mount = () => {
+        const editField = document.createElement('input');
+        editField.type = 'text';
+        editField.classList.add('form-control');
 
-      const blacklistContainer = document.querySelector('#list-blacklist-container');
-      blacklistContainer.innerHTML = '';
-      this._blacklistPatterns.forEach((pattern) => {
-        const item = document.createElement('button');
-        item.classList.add('list-group-item', 'list-group-item-action');
-        item.textContent = pattern;
-        item.addEventListener('click', async () => {
-          this._blacklistPatterns.delete(pattern);
+        const confirmEditButton = document.createElement('a');
+        confirmEditButton.textContent = 'Confirm';
+        confirmEditButton.classList.add('mx-1');
+
+        const editButton = document.createElement('a');
+        editButton.textContent = 'Edit';
+        editButton.classList.add('mx-1');
+
+        const deleteButton = document.createElement('a');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('mx-1');
+
+        const blacklistContainer = document.querySelector('#list-blacklist-container');
+        blacklistContainer.innerHTML = '';
+
+        const handleDelete = (item, pattern) => async () => {
+          this._whitelistPatterns.delete(pattern);
+          await saveToStorage('#input-blackist-pattern', this._blacklistPatterns);
+        };
+
+        const handleEdit = (item, pattern) => async () => {
+          this._whitelistEditing = pattern;
+          mount();
+        };
+
+        const handleConfirm = (item, pattern) => async () => {
+          this._whitelistPatterns.delete(pattern);
+          this._whitelistPatterns.add(editField.value);
           await saveToStorage('#input-blacklist-pattern', this._blacklistPatterns);
+          this._whitelistEditing = null;
+        };
+
+        const handleMouseEnter = (item, pattern) => () => {
+          if (this._whitelistEditing === pattern) {
+            while (item.firstChild) {
+              item.removeChild(item.firstChild);
+            }
+            item.textContent = '';
+
+            editField.value = pattern;
+            item.appendChild(editField);
+
+            confirmEditButton.onclick = handleConfirm(item, pattern);
+            item.appendChild(confirmEditButton);
+          } else {
+            editButton.onclick = handleEdit(item, pattern);
+            item.appendChild(editButton);
+
+            deleteButton.onclick = handleDelete(item, pattern);
+            item.appendChild(deleteButton);
+          }
+        };
+
+        const handleMouseLeave = (item, pattern) => () => {
+          if (this._whitelistEditing !== pattern) {
+            while (item.firstChild) {
+              item.removeChild(item.firstChild);
+            }
+            item.textContent = pattern;
+          }
+        };
+
+        this._blacklistPatterns = (loadedValue && loadedValue instanceof Set)
+          ? loadedValue
+          : new Set();
+
+        [...this._blacklistPatterns].sort().forEach((pattern) => {
+          const item = document.createElement('div');
+          item.classList.add('list-group-item', 'list-group-item-action');
+          item.textContent = pattern;
+
+          item.onmouseenter = handleMouseEnter(item, pattern);
+          item.onmouseleave = handleMouseLeave(item, pattern);
+
+          blacklistContainer.appendChild(item);
         });
-        blacklistContainer.appendChild(item);
-      });
+      };
+
+      mount.bind(this)();
       return defaultValue;
     },
     preSave: (saveValue) => {
       this._blacklistPatterns.add(saveValue);
       return this._blacklistPatterns;
     },
-    formatter: str => str.trim(),
   },
   {
     selector: '#input-suspend-threshold',

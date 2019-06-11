@@ -1,8 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 
-const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
-
-const loadFromStorage = (key = null) => browser.storage.local.get(key);
+import { saveToStorage, loadFromStorage } from '../utils';
 
 class TabSuspender {
   constructor() {

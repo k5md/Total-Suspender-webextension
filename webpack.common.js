@@ -40,31 +40,21 @@ module.exports = {
       {
         test: /\.(scss)$/,
         use: [{
-          loader: 'style-loader', // inject CSS to page
+          loader: 'style-loader',
         }, {
-          loader: 'css-loader', // translates CSS into CommonJS modules
+          loader: 'css-loader',
         }, {
-          loader: 'postcss-loader', // Run post css actions
+          loader: 'postcss-loader',
           options: {
-            plugins: () => { // post css plugins, can be exported to postcss.config.js
-              return [
-                require('precss'),
-                require('autoprefixer'),
-              ];
-            },
+            plugins: () => [
+              require('precss'),
+              require('autoprefixer'),
+            ],
           },
         }, {
-          loader: 'sass-loader', // compiles Sass to CSS
+          loader: 'sass-loader',
         }],
       },
-      /*{
-        test: /\.css$/,
-        use: [
-          'file-loader',
-          'extract-loader',
-          'css-loader',
-        ],
-      },*/
       {
         test: /\.(svg|png)$/,
         use: [
@@ -91,12 +81,10 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               presets: [
-                ['env', { modules: false }],
+                ['babel-preset-env', { modules: false }],
               ],
               plugins: [
-                'babel-plugin-transform-es2015-arrow-functions',
                 'babel-plugin-transform-object-rest-spread',
-                'babel-plugin-transform-runtime',
               ],
             },
           },
