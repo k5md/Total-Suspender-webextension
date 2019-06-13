@@ -1,9 +1,18 @@
-import 'bootstrap';
-import './index.scss';
-
 /* eslint no-param-reassign: ["error", { "props": false }] */
 /* eslint no-underscore-dangle: 0 */
 
+import 'bootstrap';
+import './index.scss';
+
+import App from './Containers/App';
+
+const m = require('mithril');
+
+const entrypoint = document.getElementById('entrypoint');
+m.render(entrypoint, <App />);
+
+
+/*
 import { saveToStorage, loadFromStorage } from '../utils';
 
 const update = elements => Promise.all(elements.map(async ({
@@ -12,7 +21,7 @@ const update = elements => Promise.all(elements.map(async ({
   const node = document.querySelector(selector);
   const payload = await loadFromStorage(selector);
   const loadedValue = payload[selector]; // storage.<type>.get returns object
-  const prepared = postLoad(loadedValue, defaultValue);
+  const prepared = postLoad(loadedValue, defaultValue)(selector);
   node[valueProperty] = formatter(prepared);
 
   return node;
@@ -25,7 +34,7 @@ const handleChanges = elements => elements.map(({
 
   const defaultHandler = async () => {
     node[valueProperty] = formatter(node[valueProperty]);
-    const prepared = preSave(node[valueProperty], defaultValue);
+    const prepared = preSave(node[valueProperty], defaultValue)(selector);
     await saveToStorage(selector, prepared);
   };
 
@@ -44,7 +53,7 @@ const subscribeToUpdates = (elements) => {
     loadedOptions.forEach(({
       selector, valueProperty, value, defaultValue, postLoad, formatter,
     }) => {
-      const prepared = postLoad(value, defaultValue);
+      const prepared = postLoad(value, defaultValue)(selector);
       document.querySelector(selector)[valueProperty] = formatter(prepared);
     });
   });
@@ -53,20 +62,20 @@ const subscribeToUpdates = (elements) => {
 const checkbox = {
   valueProperty: 'checked',
   defaultValue: false,
-  postLoad: (loadedValue, defaultValue) => {
+  postLoad: (loadedValue, defaultValue) => () => {
     if (typeof loadedValue !== 'boolean') {
       return defaultValue;
     }
     return loadedValue;
   },
-  preSave: saveValue => Boolean(saveValue),
+  preSave: saveValue => () => Boolean(saveValue),
   formatter: v => v,
 };
 
 const numericTextInput = {
   valueProperty: 'value',
   defaultValue: 1,
-  postLoad: (loadedValue, defaultValue) => {
+  postLoad: (loadedValue, defaultValue) => () => {
     const defaultString = defaultValue.toString();
     if (!loadedValue) {
       return defaultString;
@@ -78,7 +87,7 @@ const numericTextInput = {
     }
     return loadedString;
   },
-  preSave: (saveValue, defaultValue) => {
+  preSave: (saveValue, defaultValue) => () => {
     const saveNumber = parseInt(saveValue, 10);
 
     return Number.isNaN(saveNumber) ? defaultValue : saveNumber;
@@ -89,13 +98,13 @@ const numericTextInput = {
 const stringTextInput = {
   valueProperty: 'value',
   defaultValue: '',
-  postLoad: (loadedValue, defaultValue) => {
+  postLoad: (loadedValue, defaultValue) => () => {
     if (typeof loadedValue !== 'string') {
       return defaultValue;
     }
     return loadedValue;
   },
-  preSave: saveValue => String(saveValue),
+  preSave: saveValue => () => String(saveValue),
   formatter: str => str.trim(),
 };
 
@@ -133,8 +142,8 @@ const elements = [
   {
     selector: '#input-whitelist-pattern',
     ...stringTextInput,
-    postLoad: (loadedValue, defaultValue) => {
-      this._whitelistEditing = null;
+    postLoad: (loadedValue, defaultValue) => (selector) => {
+      this[selector]._editing = null;
       const mount = () => {
         const editField = document.createElement('input');
         editField.type = 'text';
@@ -156,24 +165,24 @@ const elements = [
         whitelistContainer.innerHTML = '';
 
         const handleDelete = (item, pattern) => async () => {
-          this._whitelistPatterns.delete(pattern);
-          await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+          this[selector]._patterns.delete(pattern);
+          await saveToStorage('#input-whitelist-pattern', this[selector]._patterns);
         };
 
         const handleEdit = (item, pattern) => async () => {
-          this._whitelistEditing = pattern;
+          this[selector]._editing = pattern;
           mount();
         };
 
         const handleConfirm = (item, pattern) => async () => {
-          this._whitelistPatterns.delete(pattern);
-          this._whitelistPatterns.add(editField.value);
-          await saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
-          this._whitelistEditing = null;
+          this[selector]._patterns.delete(pattern);
+          this[selector]._patterns.add(editField.value);
+          await saveToStorage('#input-whitelist-pattern', this[selector]._patterns);
+          this[selector]._editing = null;
         };
 
         const handleMouseEnter = (item, pattern) => () => {
-          if (this._whitelistEditing === pattern) {
+          if (this[selector]._editing === pattern) {
             while (item.firstChild) {
               item.removeChild(item.firstChild);
             }
@@ -194,7 +203,7 @@ const elements = [
         };
 
         const handleMouseLeave = (item, pattern) => () => {
-          if (this._whitelistEditing !== pattern) {
+          if (this[selector]._editing !== pattern) {
             while (item.firstChild) {
               item.removeChild(item.firstChild);
             }
@@ -202,11 +211,11 @@ const elements = [
           }
         };
 
-        this._whitelistPatterns = (loadedValue && loadedValue instanceof Set)
+        this[selector]._patterns = (loadedValue && loadedValue instanceof Set)
           ? loadedValue
           : new Set();
 
-        [...this._whitelistPatterns].sort().forEach((pattern) => {
+        [...this[selector]._patterns].sort().forEach((pattern) => {
           const item = document.createElement('div');
           item.classList.add('list-group-item', 'list-group-item-action');
           item.textContent = pattern;
@@ -221,9 +230,9 @@ const elements = [
       mount.bind(this)();
       return defaultValue;
     },
-    preSave: (saveValue) => {
-      this._whitelistPatterns.add(saveValue);
-      return this._whitelistPatterns;
+    preSave: saveValue => (selector) => {
+      this[selector]._patterns.add(saveValue);
+      return this[selector]._patterns;
     },
   },
   {
@@ -233,7 +242,7 @@ const elements = [
   {
     selector: '#input-blacklist-pattern',
     ...stringTextInput,
-    postLoad: (loadedValue, defaultValue) => {
+    postLoad: (loadedValue, defaultValue) => (selector) => {
       this._blacklistEditing = null;
       const mount = () => {
         const editField = document.createElement('input');
@@ -335,3 +344,4 @@ const elements = [
 update(elements);
 handleChanges(elements);
 subscribeToUpdates(elements);
+*/

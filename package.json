@@ -23,10 +23,12 @@
   "devDependencies": {
     "autoprefixer": "^9.5.1",
     "babel-core": "^6.26.0",
+    "babel-eslint": "^10.0.1",
     "babel-loader": "^7.1.2",
-    "babel-minify-webpack-plugin": "^0.2.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
     "babel-plugin-transform-es2015-instanceof": "^6.22.0",
+    "babel-plugin-transform-jsx": "^2.0.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
@@ -37,8 +39,8 @@
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-jest": "^22.6.4",
+    "eslint-plugin-jsx": "0.0.2",
     "extract-loader": "^1.0.1",
-    "extract-text-webpack-plugin": "^3.0.1",
     "extricate-loader": "^2.0.0",
     "file-loader": "^1.1.5",
     "html-loader": "^0.5.1",
@@ -56,16 +58,19 @@
     "spawn-loader": "^4.0.0",
     "style-loader": "^0.23.1",
     "webextension-polyfill": "^0.2.1",
-    "webpack": "^3.7.1",
-    "webpack-merge": "^4.2.1",
     "webpack-sources": "1.0.1"
   },
   "dependencies": {
+    "babel-minify-webpack-plugin": "^0.2.0",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.3.1",
+    "extract-text-webpack-plugin": "^3.0.2",
     "jquery": "^3.4.1",
     "lodash": "^4.17.11",
     "melanke-watchjs": "^1.5.0",
-    "popper.js": "^1.15.0"
+    "mithril": "^1.1.6",
+    "popper.js": "^1.15.0",
+    "webpack": "^3.12.0",
+    "webpack-merge": "^4.2.1"
   }
 }

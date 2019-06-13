@@ -3,18 +3,21 @@ const webpack = require('webpack');
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const SRC_DIR = path.resolve(__dirname, 'src');
-const MANIFEST_FILE = 'manifest.json';
 
-const manifestPath = path.join(SRC_DIR, MANIFEST_FILE);
+const JSXJS = path.resolve(SRC_DIR, 'jsx.js');
+
+const MANIFEST_FILE = 'manifest.json';
+const MANIFEST_PATH = path.join(SRC_DIR, MANIFEST_FILE);
 
 module.exports = {
   output: {
     filename: MANIFEST_FILE,
     path: DIST_DIR,
   },
-  entry: manifestPath,
+  entry: MANIFEST_PATH,
   resolve: {
     modules: [path.resolve(__dirname, 'src'), 'node_modules'],
   },
@@ -39,21 +42,11 @@ module.exports = {
       },
       {
         test: /\.(scss)$/,
-        use: [{
-          loader: 'style-loader',
-        }, {
-          loader: 'css-loader',
-        }, {
-          loader: 'postcss-loader',
-          options: {
-            plugins: () => [
-              require('precss'),
-              require('autoprefixer'),
-            ],
-          },
-        }, {
-          loader: 'sass-loader',
-        }],
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader',
+        ],
       },
       {
         test: /\.(svg|png)$/,
@@ -85,6 +78,8 @@ module.exports = {
               ],
               plugins: [
                 'babel-plugin-transform-object-rest-spread',
+                'babel-plugin-transform-class-properties',
+                ['babel-plugin-transform-jsx', { module: JSXJS, useVariables: true }],
               ],
             },
           },
@@ -95,7 +90,7 @@ module.exports = {
         ],
       },
       {
-        test: manifestPath,
+        test: MANIFEST_PATH,
         use: ExtractTextPlugin.extract([
           'raw-loader',
           'extricate-loader',

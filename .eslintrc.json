@@ -1,14 +1,24 @@
 {
-    "extends": [
-        "airbnb-base",
-        "plugin:jest/recommended"
-    ],
-    "plugins": [
-        "jest"
-    ],
-    "env": {
-        "browser": true,
-        "webextensions": true,
-        "jest": true
+  "extends": [
+      "airbnb-base",
+      "plugin:jest/recommended"
+  ],
+  "plugins": [
+      "jsx",
+      "jest"
+  ],
+  "env": {
+      "browser": true,
+      "webextensions": true,
+      "jest": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     }
+  },
+  "rules": {
+    "jsx/mark-used-vars": 2
+  },
+  "parser": "babel-eslint"
 }
