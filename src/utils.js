@@ -17,4 +17,3 @@ export class Console {
     console.log(`%c${this.title} ---`, 'color: red;', ...body);
   }
 }
-

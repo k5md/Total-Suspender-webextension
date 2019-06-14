@@ -56,7 +56,11 @@ module.exports = {
       },
       {
         test: /index\.js$/,
-        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src/background/index.js'),
+          path.resolve(__dirname, 'src/popup/index.js'),
+        ],
+        // exclude: /node_modules/,
         use: [
           {
             loader: 'spawn-loader',

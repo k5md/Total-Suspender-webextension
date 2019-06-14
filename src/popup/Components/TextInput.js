@@ -5,6 +5,8 @@ const TextInput = {
     attrs: {
       title,
       id: id = _.uniqueId(),
+      oninput: oninput = () => {},
+      value: value = '',
     },
   }) => (
     <div className="input-group d-flex justify-content-between mb-4">
@@ -13,7 +15,7 @@ const TextInput = {
           <span className="input-group-text">{title}</span>
         </div>
       )}
-      <input type="text" className="form-control" id={id} />
+      <input type="text" className="form-control" {...{ id, value, oninput }}/>
     </div>
   ),
 };

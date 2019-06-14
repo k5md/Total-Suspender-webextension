@@ -1,3 +1,4 @@
+import './index.scss';
 
 const Card = {
   view: ({

@@ -1,0 +1,11 @@
+input[type="checkbox"] {
+	display: none;
+}
+.toggle input[type="checkbox"] {
+	+ label:after {
+		content: attr(data-off-text);
+	}
+	&:checked + label:after {
+		content: attr(data-on-text);
+	}
+}

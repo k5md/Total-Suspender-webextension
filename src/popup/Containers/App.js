@@ -5,15 +5,17 @@ import Actions from './Actions';
 import Whitelist from './Whitelist';
 import Blacklist from './Blacklist';
 
+import '../index.scss';
+
 const App = {
   view: () => (
     <Card title="Total Suspender">
       <TabsList
         tabs={[
-          { id: 'Settings', element: <Settings /> },
-          { id: 'Actions', element: <Actions /> },
-          { id: 'Whitelist', element: <Whitelist /> },
-          { id: 'Blacklist', element: <Blacklist /> },
+          { id: 'Settings', render: () => <Settings /> },
+          { id: 'Actions', render: () => <Actions /> },
+          { id: 'Whitelist', render: () => <Whitelist /> },
+          { id: 'Blacklist', render: () => <Blacklist /> },
         ]}
       />
     </Card>

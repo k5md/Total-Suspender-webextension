@@ -1,13 +1,22 @@
 import _ from 'lodash';
+import './index.scss';
+
+const purposes = {
+  primary: 'btn-outline-primary',
+  warning: 'btn-warning',
+  secondary: 'btn-secondary',
+};
 
 const Toggle = {
   view: ({
     attrs: {
       title,
       checked: checked = true,
+      oninput: oninput = () => {},
       id: id = _.uniqueId(),
       onText: onText = 'On',
       offText: offText = 'Off',
+      purpose: purpose = 'primary',
     },
   }) => (
     <div className="input-group d-flex justify-content-between mb-4">
@@ -17,8 +26,8 @@ const Toggle = {
         </div>
       )}
       <div className="toggle">
-        <input type="checkbox" id={id} {...{ checked }} />
-        <label className="btn btn-warning" for={id} data-on-text={onText} data-off-text={offText} />
+        <input type="checkbox" {...{ id, checked, oninput }}/>
+        <label className={`btn ${purposes[purpose]}`} for={id} data-on-text={onText} data-off-text={offText} />
       </div>
     </div>
   ),
