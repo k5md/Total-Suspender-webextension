@@ -7,7 +7,7 @@ import App from './Containers/App';
 const m = require('mithril');
 
 const entrypoint = document.getElementById('entrypoint');
-m.render(entrypoint, <App />);
+m.mount(entrypoint, App);
 
 /*
 import { saveToStorage, loadFromStorage } from '../utils';

@@ -5,7 +5,7 @@ const TextInput = {
     attrs: {
       title,
       id: id = _.uniqueId(),
-      oninput: oninput = () => {},
+      onchange: onchange = () => {},
       value: value = '',
     },
   }) => (
@@ -15,7 +15,7 @@ const TextInput = {
           <span className="input-group-text">{title}</span>
         </div>
       )}
-      <input type="text" className="form-control" {...{ id, value, oninput }}/>
+      <input type="text" className="form-control" {...{ id, value, onchange }}/>
     </div>
   ),
 };

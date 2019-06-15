@@ -126,7 +126,7 @@ class TabSuspender {
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
           this.console.log('suspending on planned', modifiedTabs);
           browser.tabs.discard(modifiedTabs.map(tab => tab.id));
-          // better make action generator accept async functions since this
+          // Better make action generator accept async functions since this
           // below can cause unexpected behaviour
           saveToStorage('#input-suspend-planned', false);
           return modifiedTabs;

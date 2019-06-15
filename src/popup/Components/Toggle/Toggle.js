@@ -12,7 +12,7 @@ const Toggle = {
     attrs: {
       title,
       checked: checked = true,
-      oninput: oninput = () => {},
+      onchange: onchange = () => {},
       id: id = _.uniqueId(),
       onText: onText = 'On',
       offText: offText = 'Off',
@@ -26,7 +26,7 @@ const Toggle = {
         </div>
       )}
       <div className="toggle">
-        <input type="checkbox" {...{ id, checked, oninput }}/>
+        <input type="checkbox" {...{ id, checked, onchange }}/>
         <label className={`btn ${purposes[purpose]}`} for={id} data-on-text={onText} data-off-text={offText} />
       </div>
     </div>

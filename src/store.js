@@ -1,73 +1,81 @@
-import { watch } from 'melanke-watchjs';
 import { Console, saveToStorage, loadFromStorage } from './utils';
 
-const cconsole = new Console('Store', 'debug');
+const m = require('mithril');
+const stream = require('mithril/stream');
+
+const storageConsole = new Console('Local storage', 'debug');
+const stateConsole = new Console('State', 'debug');
+
 // Store initial state
-const store = {
+const initialState = {
   // Settings
-  'input-disable-suspension': false,
-  'input-delay-suspend': '60',
-  'input-ignore-audible': true,
-  'input-ignore-pinned': true,
-  'input-suspend-threshold': '1',
+  '#input-disable-suspension': false,
+  '#input-delay-suspend': '60',
+  '#input-ignore-audible': true,
+  '#input-ignore-pinned': true,
+  '#input-suspend-threshold': '1',
 
   // Actions
-  'input-suspend-planned': false,
-  'input-suspend-all-planned': false,
+  '#input-suspend-planned': false,
+  '#input-suspend-all-planned': false,
 
   // Whitelist
-  'input-enable-whitelist': true,
-  'input-whitelist-pattern': '',
+  '#input-enable-whitelist': true,
+  '#input-whitelist-pattern': '',
 
   // Blacklist
-  'input-enable-blacklist': true,
-  'input-blacklist-pattern': '',
+  '#input-enable-blacklist': true,
+  '#input-blacklist-pattern': '',
 };
 
+const state = stream(initialState);
+
+const setState = (newState) => {
+  const oldState = state();
+  if (JSON.stringify(oldState) === JSON.stringify(newState)) {
+    stateConsole.log('value not changed');
+    return;
+  }
+  state(newState);
+  stateConsole.log(state());
+  // Keep localStorage in sync
+  Object.entries(newState).forEach(([selector, newValue]) => saveToStorage(selector, newValue));
+
+  m.redraw();
+};
+
+// Watch for changes in localStorage and keep state in sync
+const storageListener = (changes, area) => {
+  if (area !== 'local') {
+    return;
+  }
+
+  const oldState = state();
+  const newState = Object.entries(changes).reduce(
+    (acc, [selector, { newValue }]) => ({ ...acc, [selector]: newValue }), oldState,
+  );
+  if (JSON.stringify(oldState) === JSON.stringify(newState)) {
+    storageConsole.log('value not changed') 
+    return;
+  }
+  setState(newState);
+  storageConsole.log(state());
+};
+
+
+const rehydrate = async (sponge) => {
+  const water = await loadFromStorage();
+  return { ...sponge, ...water };
+};
+
+// Updates state from initialState with values from localStorage
 const prepare = async () => {
-  cconsole.log('store initialization', store);
-
-  // Rehydrate store with values stored in localStorage
-  const rehydrate = async (sponge) => {
-    const water = await loadFromStorage();
-    Object.keys(sponge).forEach((key) => {
-      /* eslint-disable-next-line no-param-reassign */
-      if (water[key]) sponge[key] = water[key];
-    });
-  };
-
-  await rehydrate(store);
-  cconsole.log('store rehydrated', store);
-
-
-  // NOTE: Avoid intensive updating (like changing store in oninput of text input elements)
-  // since it would put store in circular update loop
-  // TODO: Fix this behaviour
-
-  // Watch for changes in store and keep localStorage in sync
-  watch(store, async (prop, action, newValue) => {
-    cconsole.log('state changed', prop, newValue);
-    await saveToStorage(prop, newValue);
-  });
-
-  // Watch for changes in localStorage and keep store in sync
-  browser.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'local') {
-      return;
-    }
-    Object.entries(changes).forEach(([selector, { newValue }]) => {
-      // Ignore storage items not belonging to the store, do not update unchanged items
-      if (!Object.prototype.hasOwnProperty.call(store, selector)
-        && JSON.stringify(store[selector]) === JSON.stringify(newValue)
-      ) {
-        return;
-      }
-      cconsole.log('storage changed', selector, newValue);
-      store[selector] = newValue;
-    });
-  });
+  const newState = await rehydrate(initialState);
+  state(newState);
+  m.redraw();
+  browser.storage.onChanged.addListener(storageListener);
 };
 
 prepare();
 
-export default store;
+export { state, setState };
