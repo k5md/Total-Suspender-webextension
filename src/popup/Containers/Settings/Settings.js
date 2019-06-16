@@ -21,7 +21,7 @@ const Settings = () => {
           purpose="warning"
         />
         <TextInput
-          title="Suspend after this many seconds"
+          prepend={(<span className="input-group-text">"Suspend after this many seconds"</span>)}
           value={state()['#input-delay-suspend']}
           onchange={(e) => { handleChanges('#input-delay-suspend', e.target.value); }}
         />
@@ -29,7 +29,7 @@ const Settings = () => {
           title="Ignore tabs producing sound"
           checked={state()['#input-ignore-audible']}
           onchange={(e) => { handleChanges('#input-ignore-audible', e.target.checked); }}
-          purpose="warning"
+          purpose="secondary"
         />
         <Toggle
           title="Ignore pinned tabs"
@@ -38,7 +38,7 @@ const Settings = () => {
           purpose="secondary"
         />
         <TextInput
-          title="Suspend when the loaded tabs count reaches"
+          prepend={(<span className="input-group-text">Suspend when the loaded tabs count reaches</span>)}
           value={state()['#input-suspend-threshold']}
           onchange={(e) => { handleChanges('#input-suspend-threshold', e.target.value); }}
         />

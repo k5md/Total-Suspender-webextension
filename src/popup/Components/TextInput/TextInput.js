@@ -3,19 +3,35 @@ import _ from 'lodash';
 const TextInput = {
   view: ({
     attrs: {
-      title,
+      prepend,
       id: id = _.uniqueId(),
       onchange: onchange = () => {},
+      oninput: oninput = () => {},
       value: value = '',
+      append,
     },
   }) => (
     <div className="input-group d-flex justify-content-between mb-4">
-      {title && (
+      {prepend && (
         <div className="input-group-prepend">
-          <span className="input-group-text">{title}</span>
+          {prepend}
         </div>
       )}
-      <input type="text" className="form-control" {...{ id, value, onchange }}/>
+      <input
+        type="text"
+        className="form-control"
+        {...{
+          id,
+          value,
+          onchange,
+          oninput,
+        }}
+      />
+      {append && (
+        <div class="input-group-append">
+          {append}
+        </div>
+      )}
     </div>
   ),
 };

@@ -9,7 +9,10 @@ import '../index.scss';
 
 const App = {
   view: () => (
-    <Card title="Total Suspender">
+    <Card
+      title="Total Suspender"
+      styles={ { cardContainer: 'options_card' } }
+    >
       <TabsList
         tabs={[
           { id: 'Settings', render: () => <Settings /> },

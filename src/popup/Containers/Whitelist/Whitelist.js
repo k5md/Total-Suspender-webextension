@@ -1,12 +1,48 @@
+import _ from 'lodash';
 import Toggle from '../../Components/Toggle';
 import TextInput from '../../Components/TextInput';
 import { state, setState } from '../../../store';
+import Button from '../../Components/Button';
+import EditableList from '../EditableList';
 
 const Whitelist = () => {
   const handleChanges = (selector, value) => {
     const oldState = state();
     const newState = { ...oldState, [selector]: value };
     setState(newState);
+  };
+
+  const localState = {
+    addInputText: '',
+  };
+
+  const addHandler = () => {
+    if (!localState.addInputText) {
+      return;
+    }
+    const oldSet = state()['#input-whitelist-pattern'];
+    const newSet = new Set(oldSet);
+    newSet.add(localState.addInputText);
+
+    handleChanges('#input-whitelist-pattern', newSet);
+    localState.addInputText = '';
+  };
+
+  const replaceHandler = (oldValue, newValue) => {
+    const oldSet = state()['#input-whitelist-pattern'];
+    const newSet = new Set(oldSet);
+    newSet.delete(oldValue);
+    newSet.add(newValue);
+
+    handleChanges('#input-whitelist-pattern', newSet);
+  };
+
+  const deleteHandler = (value) => {
+    const oldSet = state()['#input-whitelist-pattern'];
+    const newSet = new Set(oldSet);
+    newSet.delete(value);
+
+    handleChanges('#input-whitelist-pattern', newSet);
   };
 
   return {
@@ -20,11 +56,23 @@ const Whitelist = () => {
         />
         <div class="mb-4">Tabs with URL's matching patterns from this list will never be suspended</div>
         <TextInput
-          value={state()['#input-whitelist-pattern']}
-          onchange={(e) => { handleChanges('#input-whitelist-pattern', e.target.value); }}
-          title="URL"
+          prepend={(<span className="input-group-text">URL</span>)}
+          append={(
+            <Button
+              title="Add"
+              purpose="secondary"
+              onclick={addHandler}
+            />
+          )}
+          value={localState.addInputText}
+          oninput={(e) => { localState.addInputText = e.target.value; }}
         />
-        <div id="list-whitelist-container" class="container whitelist_container list-group"></div>
+        <EditableList
+          onEdit={replaceHandler}
+          onDelete={deleteHandler}
+          entries={[...state()['#input-whitelist-pattern']]}
+          styles={{ listContainer: 'container' }}
+        />
       </div>
     ),
   };

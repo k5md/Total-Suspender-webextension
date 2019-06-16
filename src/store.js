@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { Console, saveToStorage, loadFromStorage } from './utils';
 
 const m = require('mithril');
@@ -21,26 +22,25 @@ const initialState = {
 
   // Whitelist
   '#input-enable-whitelist': true,
-  '#input-whitelist-pattern': '',
+  '#input-whitelist-pattern': new Set(),
 
   // Blacklist
   '#input-enable-blacklist': true,
-  '#input-blacklist-pattern': '',
+  '#input-blacklist-pattern': new Set(),
 };
 
 const state = stream(initialState);
 
 const setState = (newState) => {
   const oldState = state();
-  if (JSON.stringify(oldState) === JSON.stringify(newState)) {
-    stateConsole.log('value not changed');
+  if (_.isEqual(oldState, newState)) {
+    stateConsole.log('already synced');
     return;
   }
   state(newState);
   stateConsole.log(state());
   // Keep localStorage in sync
-  Object.entries(newState).forEach(([selector, newValue]) => saveToStorage(selector, newValue));
-
+  saveToStorage(newState);
   m.redraw();
 };
 
@@ -54,8 +54,8 @@ const storageListener = (changes, area) => {
   const newState = Object.entries(changes).reduce(
     (acc, [selector, { newValue }]) => ({ ...acc, [selector]: newValue }), oldState,
   );
-  if (JSON.stringify(oldState) === JSON.stringify(newState)) {
-    storageConsole.log('value not changed') 
+  if (_.isEqual(oldState, newState)) {
+    storageConsole.log('already synced');
     return;
   }
   setState(newState);

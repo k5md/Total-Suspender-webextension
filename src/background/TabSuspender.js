@@ -32,7 +32,7 @@ class TabSuspender {
           browser.tabs.discard(modifiedTabs.map(tab => tab.id));
           // better make action generator accept async functions since this
           // below can cause unexpected behaviour
-          saveToStorage('#input-suspend-all-planned', false);
+          saveToStorage({ '#input-suspend-all-planned': false });
           return modifiedTabs;
         },
         isEnabled: value => typeof value === 'boolean' && value,
@@ -128,7 +128,7 @@ class TabSuspender {
           browser.tabs.discard(modifiedTabs.map(tab => tab.id));
           // Better make action generator accept async functions since this
           // below can cause unexpected behaviour
-          saveToStorage('#input-suspend-planned', false);
+          saveToStorage({ '#input-suspend-planned': false });
           return modifiedTabs;
         },
         isEnabled: value => typeof value === 'boolean' && value,
@@ -304,14 +304,14 @@ class TabSuspender {
           this._whitelistPatterns = new Set();
         }
         this._whitelistPatterns.add(tab.url);
-        saveToStorage('#input-whitelist-pattern', this._whitelistPatterns);
+        saveToStorage({ '#input-whitelist-pattern': this._whitelistPatterns });
       }
       if (info.menuItemId === 'total-suspender-blacklist') {
         if (!this._blacklistPatterns || !(this._blacklistPatterns instanceof Set)) {
           this._blacklistPatterns = new Set();
         }
         this._blacklistPatterns.add(tab.url);
-        saveToStorage('#input-blacklist-pattern', this._blacklistPatterns);
+        saveToStorage({ '#input-blacklist-pattern': this._blacklistPatterns });
       }
     });
   }

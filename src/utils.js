@@ -1,6 +1,6 @@
 /* eslint no-console: off */
 
-export const saveToStorage = (key, value) => browser.storage.local.set({ [key]: value });
+export const saveToStorage = hash => browser.storage.local.set(hash);
 
 export const loadFromStorage = (key = null) => browser.storage.local.get(key);
 
