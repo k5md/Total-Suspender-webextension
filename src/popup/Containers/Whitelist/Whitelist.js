@@ -89,11 +89,8 @@ const Whitelist = () => {
           purpose="secondary"
         />
         <div class="mb-4">
-          {browser.i18n.getMessage(
-            'whitelistDescription',
-            '<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp">regex</a>',
-            '<code>\regex\</code>',
-          )}
+          {browser.i18n.getMessage('whitelistDescription')}
+          <code>\regex\</code>
         </div>
         <TextInput
           prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleAddURL')}</span>)}

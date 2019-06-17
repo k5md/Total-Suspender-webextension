@@ -140,18 +140,8 @@
   },
 
   "whitelistDescription": {
-    "message": "Tabs with URL's matching patterns from this list will never be suspended. To use with $LINK$ prepend $CODE$ to the pattern",
-    "description": "Whitelisting functionality description.",
-    "placeholders": {
-      "link" : {
-        "content" : "$1",
-        "example" : "<a href=\"https://developer.mozilla.org\"regex</a>"
-      },
-      "code": {
-        "content" : "$2",
-        "example": "<code>\\regex\\</code>"
-      }
-    }
+    "message": "Tabs with URL's matching patterns from this list will never be suspended. To use regular expressions prepend ",
+    "description": "Whitelisting functionality description, followed by code tag"
   },
 
 
@@ -161,17 +151,7 @@
   },
 
   "blacklistDescription": {
-    "message": "Only tabs with URL's matching patterns from this list will be suspended. To use with $LINK$ prepend $CODE$ to the pattern",
-    "description": "Blacklisting functionality description.",
-    "placeholders": {
-      "link" : {
-        "content" : "$1",
-        "example" : "<a href=\"https://developer.mozilla.org\"regex</a>"
-      },
-      "code": {
-        "content" : "$2",
-        "example": "<code>\\regex\\</code>"
-      }
-    }
+    "message": "Only tabs with URL's matching patterns from this list will be suspended. To use regular expressions prepend ",
+    "description": "Blacklisting functionality description, followed by code tag."
   }
 }
