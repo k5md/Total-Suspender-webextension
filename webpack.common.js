@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
+const CopyPlugin = require('copy-webpack-plugin');
 
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const SRC_DIR = path.resolve(__dirname, 'src');
@@ -108,6 +108,13 @@ module.exports = {
     ],
   },
   plugins: [
+    new CopyPlugin([
+      {
+        from: 'src/_locales/*/*',
+        to: 'dist/_locales/[1]/[2]/[name].[ext]',
+        test: /([^/]+)\/(.+)\/.json$/,
+      },
+    ]),
     new ExtractTextPlugin(MANIFEST_FILE),
     new webpack.ProvidePlugin({
       browser: 'webextension-polyfill',

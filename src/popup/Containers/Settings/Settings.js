@@ -13,32 +13,32 @@ const Settings = () => {
     view: () => (
       <div>
         <Toggle
-          title="Suspension"
+          title={browser.i18n.getMessage('titleDisableSuspension')}
           checked={state()['#input-disable-suspension']}
           onchange ={(e) => { handleChanges('#input-disable-suspension', e.target.checked); }}
-          onText="Disabled"
-          offText="Enabled"
+          onText={browser.i18n.getMessage('toggleDisableSuspensionOn')}
+          offText={browser.i18n.getMessage('toggleDisableSuspensionOff')}
           purpose="warning"
         />
         <TextInput
-          prepend={(<span className="input-group-text">"Suspend after this many seconds"</span>)}
+          prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleDelaySuspend')}</span>)}
           value={state()['#input-delay-suspend']}
           onchange={(e) => { handleChanges('#input-delay-suspend', e.target.value); }}
         />
         <Toggle
-          title="Ignore tabs producing sound"
+          title={browser.i18n.getMessage('titleIgnoreAudible')}
           checked={state()['#input-ignore-audible']}
           onchange={(e) => { handleChanges('#input-ignore-audible', e.target.checked); }}
           purpose="secondary"
         />
         <Toggle
-          title="Ignore pinned tabs"
+          title={browser.i18n.getMessage('titleIgnorePinned')}
           checked={state()['#input-ignore-pinned']}
           onchange={(e) => { handleChanges('#input-ignore-pinned', e.target.checked); }}
           purpose="secondary"
         />
         <TextInput
-          prepend={(<span className="input-group-text">Suspend when the loaded tabs count reaches</span>)}
+          prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleSuspendThreshold')}</span>)}
           value={state()['#input-suspend-threshold']}
           onchange={(e) => { handleChanges('#input-suspend-threshold', e.target.value); }}
         />

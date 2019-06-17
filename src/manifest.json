@@ -25,9 +25,10 @@
     "64": "{{./icons/64.png}}",
     "128": "{{./icons/128.png}}"
   },
-  "description": "{{prop-loader?description!../package.json}}",
+  "description": "__MSG_extensionDescription__",
   "homepage_url": "{{prop-loader?homepage!../package.json}}",
   "manifest_version": 2,
   "name": "Total Suspender",
-  "version": "{{prop-loader?version!../package.json}}"
+  "version": "{{prop-loader?version!../package.json}}",
+  "default_locale": "en"
 }

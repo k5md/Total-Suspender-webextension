@@ -1,0 +1,177 @@
+{
+  "extensionDescription": {
+    "message": "A minimalistic web extension for firefox that suspends natively (with tabs.discard) all non-active tabs and requires only minimal permissions to store it's settings and filter URL's.",
+    "description": "Description of the extension."
+  },
+
+
+  "toggleDefaultOn": {
+    "message": "On",
+    "description": "Text displayed on toggle buttons if not specified (enabled state)."
+  },
+
+  "toggleDefaultOff": {
+    "message": "Off",
+    "description": "Text displayed on toggle buttons if not specified (disabled state)."
+  },
+
+
+  "titleSettings": {
+    "message": "Settings",
+    "description": "Settings navigation item title."
+  },
+
+  "titleActions": {
+    "message": "Actions",
+    "description": "Actions navigation item title."
+  },
+
+  "titleWhitelist": {
+    "message": "Whitelist",
+    "description": "Whitelist navigation item title."
+  },
+
+  "titleBlacklist": {
+    "message": "Blacklist",
+    "description": "Blacklist navigation item title."
+  },
+
+
+  "titleDisableSuspension": {
+    "message": "Suspension",
+    "description": "Text prepended to toggle button to enable/disable tabs suspension."
+  },
+
+  "toggleDisableSuspensionOn": {
+    "message": "Disabled",
+    "description": "Text displayed on the toggle button when suspension is disabled."
+  },
+
+  "toggleDisableSuspensionOff": {
+    "message": "Enabled",
+    "description": "Text displayed on the toggle button when suspension is enabled."
+  },
+
+  "titleDelaySuspend": {
+    "message": "Suspend after this many seconds",
+    "description": "Text prepended to the input element, specifying for how long a tab should be inactive to be suspended."
+  },
+
+  "titleIgnoreAudible": {
+    "message": "Ignore tabs producing sound",
+    "description": "Text prepended to the toggle button, specifying, whether the tabs, playing sound should be suspended."
+  },
+
+  "titleIgnorePinned": {
+    "message": "Ignore pinned tabs",
+    "description": "Text prepended to the toggle button, specifying, if pinned tabs should be suspended."
+  },
+
+  "titleSuspendThreshold": {
+    "message": "Suspend when the loaded tabs count reaches",
+    "description": "Text prepended to the input element, specifying how many active tabs can exist before suspension starts."
+  },
+
+  "toggleSuspendPlannedOn": {
+    "message": "Suspending...",
+    "description": "Text on toggle button indicating being in the process of suspending (enabled state)."
+  },
+
+  "toggleSuspendPlannedOff": {
+    "message": "Suspend now if criteria match",
+    "description": "Text on toogle button to suspend tabs according to the settings set (disabled state)."
+  },
+
+  "toggleSuspendAllPlannedOn": {
+    "message": "Suspending...",
+    "description": "Text on toggle button indicating being in the process of suspending (enabled state)."
+  },
+
+  "toggleSuspendAllPlannedOff": {
+    "message": "Suspend all tabs now",
+    "description": "Text on toogle button to suspend tabs disregard the settings (disabled state)."
+  },
+
+
+  "titleAddURL": {
+    "message": "URL",
+    "description": "Text prepended to the input element to add URL to a generic list"
+  },
+
+  "buttonAddEntry": {
+    "message": "Add",
+    "description": "Text on button to add generic list entry."
+  },
+
+  "buttonEditEntry": {
+    "message": "Edit",
+    "description": "Text on button to edit generic list entry."
+  },
+
+  "buttonDeleteEntry": {
+    "message": "Delete",
+    "description": "Text on button to delete generic list entry."
+  },
+
+  "buttonConfirmEditEntry": {
+    "message": "Confirm",
+    "description": "Text on button to submit changes to an already existing generic list entry."
+  },
+
+  "buttonExportList": {
+    "message": "Export",
+    "description": "Text on button to export list data to a text file."
+  },
+
+  "buttonImportList": {
+    "message": "Import",
+    "description": "Text on button to import list data from file."
+  },
+
+  "buttonClearList": {
+    "message": "Clear list",
+    "description": "Text on button to delete all generic list entries."
+  },
+
+
+  "titleEnableWhitelist": {
+    "message": "Whitelist",
+    "description": "Text prepended to toggle button to enable/disable whitelist."
+  },
+
+  "whitelistDescription": {
+    "message": "Tabs with URL's matching patterns from this list will never be suspended. To use with $LINK$ prepend $CODE$ to the pattern",
+    "description": "Whitelisting functionality description.",
+    "placeholders": {
+      "link" : {
+        "content" : "$1",
+        "example" : "<a href=\"https://developer.mozilla.org\"regex</a>"
+      },
+      "code": {
+        "content" : "$2",
+        "example": "<code>\\regex\\</code>"
+      }
+    }
+  },
+
+
+  "titleEnableBlacklist": {
+    "message": "Blacklist",
+    "description": "Text prepended to toggle button to enable/disable blacklist."
+  },
+
+  "blacklistDescription": {
+    "message": "Only tabs with URL's matching patterns from this list will be suspended. To use with $LINK$ prepend $CODE$ to the pattern",
+    "description": "Blacklisting functionality description.",
+    "placeholders": {
+      "link" : {
+        "content" : "$1",
+        "example" : "<a href=\"https://developer.mozilla.org\"regex</a>"
+      },
+      "code": {
+        "content" : "$2",
+        "example": "<code>\\regex\\</code>"
+      }
+    }
+  }
+}

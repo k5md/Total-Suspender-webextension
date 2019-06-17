@@ -15,10 +15,10 @@ const App = {
     >
       <TabsList
         tabs={[
-          { id: 'Settings', render: () => <Settings /> },
-          { id: 'Actions', render: () => <Actions /> },
-          { id: 'Whitelist', render: () => <Whitelist /> },
-          { id: 'Blacklist', render: () => <Blacklist /> },
+          { id: 'Settings', title: browser.i18n.getMessage('titleSettings'), render: () => <Settings /> },
+          { id: 'Actions', title: browser.i18n.getMessage('titleActions'), render: () => <Actions /> },
+          { id: 'Whitelist', title: browser.i18n.getMessage('titleWhitelist'), render: () => <Whitelist /> },
+          { id: 'Blacklist', title: browser.i18n.getMessage('titleBlacklist'), render: () => <Blacklist /> },
         ]}
       />
     </Card>

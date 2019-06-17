@@ -14,8 +14,8 @@ const Toggle = {
       checked: checked = true,
       onchange: onchange = () => {},
       id: id = _.uniqueId(),
-      onText: onText = 'On',
-      offText: offText = 'Off',
+      onText: onText = browser.i18n.getMessage('toggleDefaultOn') || 'On',
+      offText: offText = browser.i18n.getMessage('toggleDefaultOff') || 'Off',
       purpose: purpose = 'primary',
     },
   }) => (

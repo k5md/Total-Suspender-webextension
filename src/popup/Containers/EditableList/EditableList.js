@@ -77,8 +77,8 @@ const EditableList = () => {
               {entry}
               {state.hoveredEntry === entry && (
                 <div>
-                  <a className="mx-1" onclick={() => editHandler(entry, `${componentId}${entryIndex}`)}>Edit</a>
-                  <a className="mx-1" onclick={() => deleteHandler(entry, onDelete)}>Delete</a>
+                  <a className="mx-1" onclick={() => editHandler(entry, `${componentId}${entryIndex}`)}>{browser.i18n.getMessage('buttonEditEntry') || 'Edit'}</a>
+                  <a className="mx-1" onclick={() => deleteHandler(entry, onDelete)}>{browser.i18n.getMessage('buttonDeleteEntry') || 'Delete'}</a>
                 </div>
               )}
             </div>
@@ -91,7 +91,7 @@ const EditableList = () => {
                 value={state.newEditedEntryValue}
                 oninput={(e) => { state.newEditedEntryValue = e.target.value; }}
               />
-              <a className="mx-1" onclick={() => confirmEditHandler(onEdit)} >Confirm</a>
+              <a className="mx-1" onclick={() => confirmEditHandler(onEdit)} >{browser.i18n.getMessage('buttonConfirmEditEntry') || 'Confirm'}</a>
             </div>
           )
         ))}

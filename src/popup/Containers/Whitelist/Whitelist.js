@@ -83,17 +83,23 @@ const Whitelist = () => {
     view: () => (
       <div>
         <Toggle
-          title="Whitelist"
+          title={browser.i18n.getMessage('titleEnableWhitelist')}
           checked={state()['#input-enable-whitelist']}
           onchange={(e) => { handleChanges('#input-enable-whitelist', e.target.checked); }}
           purpose="secondary"
         />
-        <div class="mb-4">Tabs with URL's matching patterns from this list will never be suspended</div>
+        <div class="mb-4">
+          {browser.i18n.getMessage(
+            'whitelistDescription',
+            '<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp">regex</a>',
+            '<code>\regex\</code>',
+          )}
+        </div>
         <TextInput
-          prepend={(<span className="input-group-text">URL</span>)}
+          prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleAddURL')}</span>)}
           append={(
             <Button
-              title="Add"
+              title={browser.i18n.getMessage('buttonAddEntry')}
               purpose="secondary"
               onclick={addHandler}
             />
@@ -110,13 +116,14 @@ const Whitelist = () => {
 
         <div className="d-flex justify-content-around align-items-center">
           <Button
-            title="Export"
+            title={browser.i18n.getMessage('buttonExportList')}
             onclick={exportHandler}
           />
           <label
             className="mt-2 btn btn-outline-primary"
-            for="browse">
-              Import
+            for="browse"
+          >
+            {browser.i18n.getMessage('buttonImportList')}
           </label>
           <input
             type="file"
@@ -125,7 +132,7 @@ const Whitelist = () => {
             onchange={importHandler}
           />
           <Button
-            title="Clear list"
+            title={browser.i18n.getMessage('buttonClearList')}
             onclick={clearHandler}
             purpose={state.clearButtonWarn && 'warning'}
           />

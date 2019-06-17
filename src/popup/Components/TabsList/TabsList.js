@@ -9,7 +9,7 @@ const TabsList = {
       <ul className="nav nav-tabs nav-fill" role="tablist">
         {tabs.map((tab, tabIndex) => (
           <li className="nav-item">
-            <a className={`nav-link ${!tabIndex && 'active'}`} href={`#${tab.id}`} role="tab" data-toggle="tab">{tab.id}</a>
+            <a className={`nav-link ${!tabIndex && 'active'}`} href={`#${tab.id}`} role="tab" data-toggle="tab">{tab.title}</a>
           </li>
         ))}
       </ul>

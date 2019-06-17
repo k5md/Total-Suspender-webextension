@@ -14,14 +14,14 @@ const Actions = () => {
         <Toggle
           checked={state()['#input-suspend-planned']}
           onchange={(e) => { handleChanges('#input-suspend-planned', e.target.checked); }}
-          offText="Suspend now if criteria match"
-          onText="Suspending..."
+          offText={browser.i18n.getMessage('toggleSuspendPlannedOff')}
+          onText={browser.i18n.getMessage('toggleSuspendPlannedOn')}
         />
         <Toggle
           checked={state()['#input-suspend-all-planned']}
           onchange={(e) => { handleChanges('#input-suspend-all-planned', e.target.checked); }}
-          offText="Suspend all tabs now"
-          onText="Suspending..."
+          offText={browser.i18n.getMessage('toggleSuspendAllPlannedOff')}
+          onText={browser.i18n.getMessage('toggleSuspendPlannedOn')}
         />
       </div>
     ),
