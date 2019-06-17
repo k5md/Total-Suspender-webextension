@@ -108,16 +108,16 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/_locales/*/*',
-        to: 'dist/_locales/[1]/[2]/[name].[ext]',
-        test: /([^/]+)\/(.+)\/.json$/,
-      },
-    ]),
     new ExtractTextPlugin(MANIFEST_FILE),
     new webpack.ProvidePlugin({
       browser: 'webextension-polyfill',
     }),
+    new CopyPlugin([
+      {
+        from: 'src/_locales',
+        to: '_locales',
+
+      },
+    ]),
   ],
 };
