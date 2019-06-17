@@ -9,11 +9,11 @@ const Button = {
     attrs: {
       title,
       onclick: onclick = () => {},
-      purpose: purpose = 'primary',
+      purpose,
     },
   }) => (
     <button
-      class={`btn ${purposes[purpose]}`}
+      class={`btn ${purposes[purpose] || purposes.primary}`}
       type="button"
       onclick={onclick}
     >
