@@ -1,6 +1,7 @@
 /* eslint no-underscore-dangle: 0 */
 
-import { saveToStorage, loadFromStorage } from '../utils';
+import _ from 'lodash';
+import { saveToStorage, loadFromStorage, stringToRegex } from '../utils';
 
 class TabSuspender {
   constructor() {
@@ -68,7 +69,27 @@ class TabSuspender {
         action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
           // check for those updating from previous versions
           // since trying to load value from storage by non-existing key returns empty object
-          this._whitelistPatterns = (value && value instanceof Set) ? value : new Set();
+          const set = (value && value instanceof Set);
+
+          const strings = new Set();
+          const regex = new Set();
+
+          const regexMarker = '\\regex\\';
+          if (set) {
+            // Each item can be either string or regex, starting with \regex\
+            // Populate strings and regex sets based on it
+            value.forEach((item) => {
+              if (_.startsWith(item, regexMarker)) {
+                regex.add(item.slice(regexMarker.length));
+              } else {
+                strings.add(item);
+              }
+            });
+          }
+
+          this.console.log('whitelist', set, strings, regex);
+          this._whitelistPatternsStrings = strings;
+          this._whitelistPatternsRegex = regex;
 
           return modifiedTabs;
         },
@@ -77,17 +98,25 @@ class TabSuspender {
       {
         id: '#input-enable-whitelist',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
-          if (!this._whitelistPatterns
-            || (this._whitelistPatterns instanceof Set && !this._whitelistPatterns.size)
-          ) {
-            return modifiedTabs;
-          }
+          this.console.log('input-enable-whitelist', modifiedTabs);
+          const strings = (this._whitelistPatternsStrings instanceof Set)
+            ? [...this._whitelistPatternsStrings]
+            : [];
 
-          const whitelistPatterns = [...this._whitelistPatterns];
+          const regex = (this._whitelistPatternsRegex instanceof Set)
+            ? [...this._whitelistPatternsRegex]
+            : [];
 
-          return modifiedTabs.filter(
-            tab => whitelistPatterns.findIndex(pattern => tab.url.includes(pattern)) === -1,
-          );
+          return modifiedTabs.filter((tab) => {
+            // we need to get only those tabs, that DO NOT match any of pattern strings and regex
+            const inStrings = strings.findIndex(pattern => tab.url.includes(pattern)) !== -1;
+            // better compile re in whitelist-pattern
+            const inRegex = _.some(regex, (str) => {
+              const re = stringToRegex(str);
+              return tab.url.search(re) !== -1;
+            });
+            return !(inStrings || inRegex);
+          });
         },
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
@@ -97,7 +126,27 @@ class TabSuspender {
         action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
           // check for those updating from previous versions
           // since trying to load value from storage by non-existing key returns empty object
-          this._blacklistPatterns = (value && value instanceof Set) ? value : new Set();
+          const set = (value && value instanceof Set);
+
+          const strings = new Set();
+          const regex = new Set();
+
+          const regexMarker = '\\regex\\';
+          if (set) {
+            // Each item can be either string or regex, starting with \regex\
+            // Populate strings and regex sets based on it
+            value.forEach((item) => {
+              if (_.startsWith(item, regexMarker)) {
+                regex.add(item.slice(regexMarker.length));
+              } else {
+                strings.add(item);
+              }
+            });
+          }
+
+          this.console.log('blacklist', set, strings, regex);
+          this._blacklistPatternsStrings = strings;
+          this._blacklistPatternsRegex = regex;
 
           return modifiedTabs;
         },
@@ -106,17 +155,24 @@ class TabSuspender {
       {
         id: '#input-enable-blacklist',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
-          if (!this._blacklistPatterns
-            || (this._blacklistPatterns instanceof Set && !this._blacklistPatterns.size)
-          ) {
-            return modifiedTabs;
-          }
+          const strings = (this._blacklistPatternsStrings instanceof Set)
+            ? [...this._blacklistPatternsStrings]
+            : [];
 
-          const blacklistPatterns = [...this._blacklistPatterns];
+          const regex = (this._blacklistPatternsRegex instanceof Set)
+            ? [...this._blacklistPatternsRegex]
+            : [];
 
-          return modifiedTabs.filter(
-            tab => blacklistPatterns.findIndex(pattern => tab.url.includes(pattern)) !== -1,
-          );
+          return modifiedTabs.filter((tab) => {
+            // we need to get only those tabs, that DO match a pattern in strings or regex
+            const inStrings = strings.findIndex(pattern => tab.url.includes(pattern)) !== -1;
+            // better compile re in whitelist-pattern
+            const inRegex = _.some(regex, (str) => {
+              const re = stringToRegex(str);
+              return tab.url.search(re) !== -1;
+            });
+            return inStrings || inRegex;
+          });
         },
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
@@ -300,18 +356,18 @@ class TabSuspender {
         browser.tabs.discard(tab.id);
       }
       if (info.menuItemId === 'total-suspender-whitelist') {
-        if (!this._whitelistPatterns || !(this._whitelistPatterns instanceof Set)) {
-          this._whitelistPatterns = new Set();
+        if (!(this._whitelistPatternsStrings instanceof Set)) {
+          this._whitelistPatternsStrings = new Set();
         }
-        this._whitelistPatterns.add(tab.url);
-        saveToStorage({ '#input-whitelist-pattern': this._whitelistPatterns });
+        this._whitelistPatternsStrings.add(tab.url);
+        saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
       }
       if (info.menuItemId === 'total-suspender-blacklist') {
-        if (!this._blacklistPatterns || !(this._blacklistPatterns instanceof Set)) {
-          this._blacklistPatterns = new Set();
+        if (!(this._blacklistPatternsStrings instanceof Set)) {
+          this._blacklistPatternsStrings = new Set();
         }
-        this._blacklistPatterns.add(tab.url);
-        saveToStorage({ '#input-blacklist-pattern': this._blacklistPatterns });
+        this._blacklistPatternsStrings.add(tab.url);
+        saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
       }
     });
   }
