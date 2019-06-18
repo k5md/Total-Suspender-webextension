@@ -163,6 +163,12 @@ class TabSuspender {
             ? [...this._blacklistPatternsRegex]
             : [];
 
+          // NOTE: if both lists are empty, we simply return modifiedTabs
+          // to suspend all of them istead of suspending none.
+          if (!strings.length && !regex.length) {
+            return modifiedTabs;
+          }
+
           return modifiedTabs.filter((tab) => {
             // we need to get only those tabs, that DO match a pattern in strings or regex
             const inStrings = strings.findIndex(pattern => tab.url.includes(pattern)) !== -1;

@@ -151,7 +151,7 @@
   },
 
   "blacklistDescription": {
-    "message": "Only tabs with URL's containing patterns from this list will be suspended. To use regular expressions prepend ",
+    "message": "Only tabs with URL's containing patterns from this list will be suspended. Empty list is equivalent to having 'Blacklist: off'. To use regular expressions prepend ",
     "description": "Blacklisting functionality description, followed by code tag."
   }
 }

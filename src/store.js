@@ -25,7 +25,7 @@ const initialState = {
   '#input-whitelist-pattern': new Set(),
 
   // Blacklist
-  '#input-enable-blacklist': true,
+  '#input-enable-blacklist': false,
   '#input-blacklist-pattern': new Set(),
 };
 
