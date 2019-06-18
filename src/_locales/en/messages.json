@@ -140,7 +140,7 @@
   },
 
   "whitelistDescription": {
-    "message": "Tabs with URL's matching patterns from this list will never be suspended. To use regular expressions prepend ",
+    "message": "Tabs with URL's containing patterns from this list will never be suspended. To use regular expressions prepend ",
     "description": "Whitelisting functionality description, followed by code tag"
   },
 
@@ -151,7 +151,7 @@
   },
 
   "blacklistDescription": {
-    "message": "Only tabs with URL's matching patterns from this list will be suspended. To use regular expressions prepend ",
+    "message": "Only tabs with URL's containing patterns from this list will be suspended. To use regular expressions prepend ",
     "description": "Blacklisting functionality description, followed by code tag."
   }
 }
