@@ -9,6 +9,7 @@ const TextInput = {
       oninput,
       value: value = '',
       append,
+      pattern,
     },
   }) => (
     <div className="input-group d-flex justify-content-between mb-4">
@@ -25,6 +26,7 @@ const TextInput = {
           value,
           onchange,
           oninput,
+          pattern,
         }}
       />
       {append && (

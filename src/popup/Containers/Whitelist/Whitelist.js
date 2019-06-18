@@ -50,7 +50,7 @@ const Whitelist = () => {
   const exportHandler = () => {
     const payload = JSON.stringify(state()['#input-whitelist-pattern']);
     const a = document.createElement('a');
-    a.download = 'TotalSuspenderWhitelist.txt';
+    a.download = 'TotalSuspenderWhitelist.json';
     a.href = `data:application/octet-stream,${payload}`;
     document.body.appendChild(a);
     a.click();

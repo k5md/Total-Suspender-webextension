@@ -50,7 +50,7 @@ const Blacklist = () => {
   const exportHandler = () => {
     const payload = JSON.stringify(state()['#input-blacklist-pattern']);
     const a = document.createElement('a');
-    a.download = 'TotalSuspenderBlacklist.txt';
+    a.download = 'TotalSuspenderBlacklist.json';
     a.href = `data:application/octet-stream,${payload}`;
     document.body.appendChild(a);
     a.click();

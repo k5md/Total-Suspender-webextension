@@ -24,6 +24,7 @@ const Settings = () => {
           prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleDelaySuspend')}</span>)}
           value={state()['#input-delay-suspend']}
           onchange={(e) => { handleChanges('#input-delay-suspend', e.target.value); }}
+          pattern="[0-9]{1,4}"
         />
         <Toggle
           title={browser.i18n.getMessage('titleIgnoreAudible')}
@@ -41,6 +42,7 @@ const Settings = () => {
           prepend={(<span className="input-group-text">{browser.i18n.getMessage('titleSuspendThreshold')}</span>)}
           value={state()['#input-suspend-threshold']}
           onchange={(e) => { handleChanges('#input-suspend-threshold', e.target.value); }}
+          pattern="[0-9]{1,4}"
         />
       </div>
     ),
