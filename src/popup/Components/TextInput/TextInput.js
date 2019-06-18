@@ -5,8 +5,8 @@ const TextInput = {
     attrs: {
       prepend,
       id: id = _.uniqueId(),
-      onchange: onchange = () => {},
-      oninput: oninput = () => {},
+      onchange,
+      oninput,
       value: value = '',
       append,
     },
