@@ -16,7 +16,8 @@
   "jest": {
     "setupFiles": [
       "jest-webextension-mock"
-    ]
+    ],
+    "testURL": "http://localhost/"
   },
   "author": "k5md",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "autoprefixer": "^9.5.1",
     "babel-core": "^6.26.0",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
@@ -47,7 +49,7 @@
     "html-loader": "^0.5.1",
     "imports-loader": "^0.7.1",
     "interpolate-loader": "^2.0.0",
-    "jest": "^24.1.0",
+    "jest": "^22.4.4",
     "jest-webextension-mock": "^3.5.0",
     "node-sass": "^4.12.0",
     "postcss-loader": "^3.0.0",
