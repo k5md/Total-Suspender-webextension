@@ -108,7 +108,7 @@ const Blacklist = () => {
           onEdit={replaceHandler}
           onDelete={deleteHandler}
           entries={[...state()['#input-blacklist-pattern']]}
-          styles={{ listContainer: 'container mb-4' }}
+          styles={{ listContainer: 'container mb-3' }}
         />
 
         <div className="d-flex justify-content-around align-items-center">
