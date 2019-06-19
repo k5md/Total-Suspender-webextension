@@ -61,7 +61,8 @@
     "spawn-loader": "^4.0.0",
     "style-loader": "^0.23.1",
     "webextension-polyfill": "^0.2.1",
-    "webpack-sources": "1.0.1"
+    "webpack-sources": "1.0.1",
+    "web-ext": "^2.9.3"
   },
   "dependencies": {
     "babel-minify-webpack-plugin": "^0.2.0",
