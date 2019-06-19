@@ -10,7 +10,7 @@
     "build-dev": "npx rimraf ./dist && npx webpack --config ./webpack.dev.js",
     "build-prod": "npx rimraf ./dist && npx webpack --config ./webpack.prod.js",
     "browser": "web-ext run --config .web-ext-config.js",
-    "pack": "npm build-prod && web-ext build --config .web-ext-config.js",
+    "pack": "npm run build-prod && web-ext build --config .web-ext-config.js",
     "watch": "npm run build-dev && concurrently \"npx webpack --config ./webpack.dev.js --watch\" \"web-ext run --config .web-ext-config.js\""
   },
   "jest": {
