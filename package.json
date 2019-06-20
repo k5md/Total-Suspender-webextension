@@ -1,6 +1,6 @@
 {
   "name": "Total-Suspender-webextension",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "A minimalistic web extension for firefox that suspends natively (with tabs.discard) not-active tabs.",
   "homepage": "https://github.com/k5md/Total-Suspender-webextension",
   "scripts": {
@@ -37,6 +37,7 @@
     "clean-webpack-plugin": "^0.1.17",
     "concurrently": "^4.1.0",
     "copy-webpack-plugin": "^4.6.0",
+    "crlf": "^1.1.1",
     "css-loader": "^2.1.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
@@ -54,6 +55,8 @@
     "node-sass": "^4.12.0",
     "postcss-loader": "^3.0.0",
     "precss": "^4.0.0",
+    "prettier": "^1.18.2",
+    "prettier-webpack-plugin": "^0.2.3",
     "prop-loader": "^1.0.0",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.3",
