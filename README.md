@@ -20,10 +20,14 @@ A not-so-minimalistic web extension for Firefox that suspends natively (with tab
 
 #### Linux
 1. Install [node and npm](https://nodejs.org)
-2. In the project directory run one of these commands:
-`make build-dev` to build for development
-`make build-prod` to build for production
-`make pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
+2. In the project directory run `make install`
+3. In the project directory run one of these commands:
+
+   `make build-dev` to build for development
+
+   `make build-prod` to build for production
+
+   `make pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
 Building has been tested with:
 - Node.js version [11.15.0](https://nodejs.org/download/release/v11.15.0/)
@@ -32,10 +36,14 @@ Building has been tested with:
 
 #### Windows
 1. Install [node and npm](https://nodejs.org)
-2. In the project directory run one of these commands:
-`npm run build-dev` to build for development
-`npm run build-prod` to build for production
-`npm run pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
+2. Int the project directory run `npm run install`
+3. In the project directory run one of these commands:
+
+   `npm run build-dev` to build for development
+
+   `npm run build-prod` to build for production
+
+   `npm run pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
 Building has been tested with:
 - Node.js version [10.13.0](https://nodejs.org/download/release/v10.13.0/)
