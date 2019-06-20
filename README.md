@@ -42,7 +42,7 @@ Building has been tested with:
 - npm version 6.9.0
 - Windows 7 SP1
 
-**Note, that consistent line endings in build files are ensured by prettify with [prettify-webpack-plugin](https://www.npmjs.com/package/prettier-webpack-plugin), so that there is no difference depending on OS in archieves, packaged with web-ext!**
+For verification and calculating diffs with submitted addon, use Windows configuration. On Linux and MacOS systems diff will fail because of line endings difference affecting webpack hash generation. Or use diff with --strip-trailing-cr on .html and .js files.
 
 ## Development
 To monitor changes in browser with hot-reloading you can do
