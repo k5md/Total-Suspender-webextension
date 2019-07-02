@@ -2,4 +2,5 @@
 *.sublime-workspace
 web-ext-artifacts
 node_modules
+TotalSuspenderFirefoxProfile
 dist

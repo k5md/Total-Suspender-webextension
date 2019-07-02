@@ -5,7 +5,7 @@ module.exports = {
     overwriteDest: true,
   },
   run: {
-    firefoxProfile: '../testProfile',
+    firefoxProfile: 'TotalSuspenderFirefoxProfile',
     keepProfileChanges: true,
   },
 };
