@@ -297,7 +297,8 @@ class TabSuspender {
   async updateConfig() {
     const loadedOptions = await Promise.all(this.config.map(async (option) => {
       const { id, defaultValue } = option;
-      const value = (await loadFromStorage(id))[id] || defaultValue;
+      const data = await loadFromStorage(id);
+      const value = data[id] !== undefined ? data[id] : defaultValue;
       return { ...option, value };
     }));
 

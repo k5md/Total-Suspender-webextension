@@ -4,8 +4,8 @@ import { Console, saveToStorage, loadFromStorage } from './utils';
 const m = require('mithril');
 const stream = require('mithril/stream');
 
-const storageConsole = new Console('Local storage', 'debug');
-const stateConsole = new Console('State', 'debug');
+const storageConsole = new Console('Local storage', !PRODUCTION && 'debug');
+const stateConsole = new Console('State', !PRODUCTION && 'debug');
 
 // Store initial state
 const initialState = {
@@ -52,7 +52,7 @@ const storageListener = (changes, area) => {
 
   const oldState = state();
   const newState = Object.entries(changes).reduce(
-    (acc, [selector, { newValue }]) => ({ ...acc, [selector]: newValue }), oldState,
+    (acc, [selector, { newValue }]) => ({ ...acc, [selector]: newValue }), { ...oldState },
   );
   if (_.isEqual(oldState, newState)) {
     storageConsole.log('already synced');
