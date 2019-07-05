@@ -1,8 +1,8 @@
-import _ from 'lodash';
 import Toggle from '../../Components/Toggle';
 import TextInput from '../../Components/TextInput';
 import { state, setState } from '../../../store';
 import Button from '../../Components/Button';
+import FileInputButton from '../../Components/FileInputButton';
 import EditableList from '../EditableList';
 import './index.scss';
 
@@ -116,16 +116,8 @@ const Whitelist = () => {
             title={browser.i18n.getMessage('buttonExportList')}
             onclick={exportHandler}
           />
-          <label
-            className="mt-2 btn btn-outline-primary"
-            for="browse"
-          >
-            {browser.i18n.getMessage('buttonImportList')}
-          </label>
-          <input
-            type="file"
-            id="browse"
-            style="display: none"
+          <FileInputButton
+            title={browser.i18n.getMessage('buttonImportList')}
             onchange={importHandler}
           />
           <Button

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const purposes = {
   primary: 'btn-outline-primary',
   warning: 'btn-warning',
@@ -7,18 +9,19 @@ const purposes = {
 const Button = {
   view: ({
     attrs: {
+      id: id = _.uniqueId(),
       title,
       onclick: onclick = () => {},
       purpose,
     },
   }) => (
-    <button
-      class={`btn ${purposes[purpose] || purposes.primary}`}
+    <input
+      id={id}
       type="button"
+      class={`btn ${purposes[purpose] || purposes.primary}`}
       onclick={onclick}
-    >
-      {title}
-    </button>
+      value={title}
+    />
   ),
 };
 
