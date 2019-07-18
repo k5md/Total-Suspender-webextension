@@ -79,7 +79,7 @@
 
   "toggleSuspendPlannedOff": {
     "message": "Suspend now if criteria match",
-    "description": "Text on toogle button to suspend tabs according to the settings set (disabled state)."
+    "description": "Text on toggle button to suspend tabs according to the settings set (disabled state)."
   },
 
   "toggleSuspendAllPlannedOn": {
@@ -89,7 +89,7 @@
 
   "toggleSuspendAllPlannedOff": {
     "message": "Suspend all tabs now",
-    "description": "Text on toogle button to suspend tabs disregard the settings (disabled state)."
+    "description": "Text on toggle button to suspend tabs disregard the settings (disabled state)."
   },
 
 
