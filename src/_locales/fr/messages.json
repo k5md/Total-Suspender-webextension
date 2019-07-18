@@ -1,0 +1,157 @@
+{
+  "extensionDescription": {
+    "message": "Une extension web minimaliste pour firefox qui suspend de manière native (avec tabs.discard) tous les onglets non actifs et ne requiert que des autorisations minimales pour stocker ses paramètres et filtrer les URL.",
+    "description": "Description de l'extension."
+  },
+
+
+  "toggleDefaultOn": {
+    "message": "On",
+    "description": "Texte affiché sur les boutons bascule s'il n'est pas spécifié (état activé)."
+  },
+
+  "toggleDefaultOff": {
+    "message": "Off",
+    "description": "Texte affiché sur les boutons bascule s'il n'est pas spécifié (état désactivé)."
+  },
+
+
+  "titleSettings": {
+    "message": "Réglages",
+    "description": "Titre de l'élément de navigation des paramètres."
+  },
+
+  "titleActions": {
+    "message": "Actions",
+    "description": "Titre de l'élément de navigation Actions."
+  },
+
+  "titleWhitelist": {
+    "message": "Liste blanche",
+    "description": "Titre de l'élément de navigation de la liste blanche."
+  },
+
+  "titleBlacklist": {
+    "message": "Liste noire",
+    "description": "Titre de l'élément de navigation de la liste noire."
+  },
+
+
+  "titleDisableSuspension": {
+    "message": "Suspension",
+    "description": "Le texte est préfixé au bouton bascule pour activer / désactiver la suspension des tabulations."
+  },
+
+  "toggleDisableSuspensionOn": {
+    "message": "Désactivé",
+    "description": "Texte affiché sur le bouton bascule lorsque la suspension est désactivée."
+  },
+
+  "toggleDisableSuspensionOff": {
+    "message": "Activé",
+    "description": "Texte affiché sur le bouton bascule lorsque la suspension est activée."
+  },
+
+  "titleDelaySuspend": {
+    "message": "Suspendre après autant de secondes",
+    "description": "Texte ajouté en amont à l'élément d'entrée, spécifiant la durée pendant laquelle un onglet doit être inactif pour être suspendu."
+  },
+
+  "titleIgnoreAudible": {
+    "message": "Ignorer les onglets produisant du son",
+    "description": "Texte précédé du bouton bascule, spécifiant si les onglets, le son lu doivent être suspendus."
+  },
+
+  "titleIgnorePinned": {
+    "message": "Ignorer les onglets épinglés",
+    "description": "Texte précédé du bouton bascule, spécifiant si les onglets épinglés doivent être suspendus."
+  },
+
+  "titleSuspendThreshold": {
+    "message": "Suspendre lorsque le nombre d'onglets chargés atteint",
+    "description": "Texte ajouté à l'élément d'entrée en précisant le nombre d'onglets actifs pouvant exister avant le début de la suspension."
+  },
+
+  "toggleSuspendPlannedOn": {
+    "message": "En suspension...",
+    "description": "Texte sur le bouton bascule indiquant la suspension (état activé)."
+  },
+
+  "toggleSuspendPlannedOff": {
+    "message": "Suspendre maintenant si les critères correspondent",
+    "description": "Texte sur le bouton bascule pour suspendre les onglets en fonction des paramètres définis (état désactivé)."
+  },
+
+  "toggleSuspendAllPlannedOn": {
+    "message": "En suspension...",
+    "description": "Texte sur le bouton bascule indiquant la suspension (état activé)."
+  },
+
+  "toggleSuspendAllPlannedOff": {
+    "message": "Suspendre tous les onglets maintenant",
+    "description": "Le texte sur le bouton bascule pour suspendre les onglets ignore les paramètres (état désactivé)."
+  },
+
+
+  "titleAddURL": {
+    "message": "URL",
+    "description": "Texte ajouté à l'élément en entrée pour ajouter l'URL à une liste générique"
+  },
+
+  "buttonAddEntry": {
+    "message": "Ajouter",
+    "description": "Texte sur le bouton pour ajouter une entrée de liste générique."
+  },
+
+  "buttonEditEntry": {
+    "message": "Editer",
+    "description": "Texte sur le bouton pour modifier l'entrée de liste générique."
+  },
+
+  "buttonDeleteEntry": {
+    "message": "Supprimer",
+    "description": "Texte sur le bouton pour supprimer l'entrée de liste générique."
+  },
+
+  "buttonConfirmEditEntry": {
+    "message": "Confirmer",
+    "description": "Texte sur le bouton pour soumettre les modifications à une entrée de liste générique déjà existante."
+  },
+
+  "buttonExportList": {
+    "message": "Exporter",
+    "description": "Texte sur le bouton pour exporter les données de la liste dans un fichier texte."
+  },
+
+  "buttonImportList": {
+    "message": "Importer",
+    "description": "Texte sur le bouton pour importer les données de la liste à partir du fichier."
+  },
+
+  "buttonClearList": {
+    "message": "Effacer la liste",
+    "description": "Texte sur le bouton pour supprimer toutes les entrées de la liste générique."
+  },
+
+
+  "titleEnableWhitelist": {
+    "message": "Liste blanche",
+    "description": "Texte préfixé pour basculer le bouton permettant d'activer / désactiver la liste blanche."
+  },
+
+  "whitelistDescription": {
+    "message": "Les onglets contenant des URL contenant des modèles de cette liste ne seront jamais suspendus. Pour utiliser des expressions régulières prepend",
+    "description": "Description de la fonctionnalité de la liste blanche, suivie d'une balise de code"
+  },
+
+
+  "titleEnableBlacklist": {
+    "message": "Liste noire",
+    "description": "Le texte est préfixé par un bouton pour activer / désactiver la liste noire."
+  },
+
+  "blacklistDescription": {
+    "message": "Seuls les onglets contenant des URL contenant des modèles de cette liste seront suspendus. Une liste vide équivaut à avoir \"Liste noire: off\". Pour utiliser des expressions régulières prepend",
+    "description": "Description de la fonctionnalité de liste noire, suivie d'une balise de code."
+  }
+}
