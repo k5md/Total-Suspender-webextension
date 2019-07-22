@@ -243,11 +243,13 @@ class TabSuspender {
         action: () => actionInfo => (rawTabs, modifiedTabs = rawTabs) => {
           browser.tabs.query({}).then((tabs) => {
             if (actionInfo.type !== 'activated') {
-              const tabsCount = actionInfo.type === 'removed' ? tabs.length - 1 : tabs.length;
+              const removed = actionInfo.type === 'removed';
+              const { isWindowClosing } = actionInfo;
+              const tabsCount = (removed && !isWindowClosing) ? tabs.length - 1 : tabs.length;
 
               browser.browserAction.setBadgeText({ text: tabsCount.toString() });
-              browser.browserAction.setBadgeTextColor({ color: [0, 0, 0, 255] });
-              browser.browserAction.setBadgeBackgroundColor({ color: [133, 133, 133, 255] });
+              browser.browserAction.setBadgeTextColor({ color: [255, 255, 255, 255] });
+              browser.browserAction.setBadgeBackgroundColor({ color: [64, 64, 64, 255] });
             }
           });
           return modifiedTabs;
@@ -266,8 +268,9 @@ class TabSuspender {
         const event = new CustomEvent('discard', { detail: { type: 'activated', id: tabId } });
         this.discardEventEmitter.dispatchEvent(event);
       },
-      onRemoved: (tabId) => {
-        const event = new CustomEvent('discard', { detail: { type: 'removed', id: tabId } });
+      onRemoved: (tabId, removeInfo) => {
+        const { isWindowClosing } = removeInfo;
+        const event = new CustomEvent('discard', { detail: { type: 'removed', id: tabId, isWindowClosing } });
         this.discardEventEmitter.dispatchEvent(event);
       },
       onUpdated: (tabId, change) => {
@@ -321,24 +324,7 @@ class TabSuspender {
     this.action = mergedActions;
   }
 
-  registerHandlers() {
-    // handle tab actions
-    Object.keys(this.tabHandlers)
-      .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
-
-    this.discardEventEmitter.addEventListener('discard', (e) => {
-      this.console.log('event', e.detail.type, e.detail.id);
-      this.handleAction({ type: e.detail.type, id: e.detail.id });
-    }, false);
-
-    // reload config after every change
-    browser.storage.onChanged.addListener(async () => {
-      await this.updateConfig();
-      this.generateAction();
-      const event = new CustomEvent('discard', { detail: { type: 'configChange' } });
-      this.discardEventEmitter.dispatchEvent(event);
-    });
-
+  createContextMenus() {
     // TODO: refactor, separate creating menus, attaching listener and listener
     browser.menus.create({
       id: 'total-suspender-suspend',
@@ -379,11 +365,32 @@ class TabSuspender {
     });
   }
 
+  registerHandlers() {
+    // handle tab actions
+    Object.keys(this.tabHandlers)
+      .forEach(event => browser.tabs[event].addListener(this.tabHandlers[event]));
+
+    this.discardEventEmitter.addEventListener('discard', (e) => {
+      const { detail } = e;
+      this.console.log('event', detail.type, detail.id);
+      this.handleAction(detail);
+    }, false);
+
+    // reload config after every change
+    browser.storage.onChanged.addListener(async () => {
+      await this.updateConfig();
+      this.generateAction();
+      const event = new CustomEvent('discard', { detail: { type: 'configChange' } });
+      this.discardEventEmitter.dispatchEvent(event);
+    });
+  }
+
   async run() {
     this.updateConfig = this.updateConfig.bind(this);
     await this.updateConfig();
     this.generateAction();
     this.registerHandlers();
+    this.createContextMenus();
   }
 }
 
