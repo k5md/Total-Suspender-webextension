@@ -23,7 +23,8 @@ class TabSuspender {
       {
         id: 'default',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs
-          .filter(tab => !tab.active && !tab.discarded),
+          .filter(tab => !tab.active && !tab.discarded)
+          .sort((a, b) => a.lastAccessed - b.lastAccessed),
         isEnabled: () => true,
       },
       {
@@ -45,7 +46,9 @@ class TabSuspender {
           if (modifiedTabs.length < value) {
             return [];
           }
-          return modifiedTabs;
+          const rest = modifiedTabs.slice(0, modifiedTabs.length - value);
+          this.console.log('thresholding', modifiedTabs, rest);
+          return rest;
         },
         isEnabled: value => !Number.isNaN(value) && value > 0,
         defaultValue: 1, // number of loaded tabs
