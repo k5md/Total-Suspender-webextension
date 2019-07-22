@@ -261,37 +261,29 @@ class TabSuspender {
       },
     ];
 
-    // TODO: refactor
     this.tabHandlers = {
-      onCreated: (tab) => {
-        const event = new CustomEvent('discard', { detail: { type: 'created', id: tab.id } });
-        this.discardEventEmitter.dispatchEvent(event);
-      },
-      onActivated: ({ tabId }) => {
-        const event = new CustomEvent('discard', { detail: { type: 'activated', id: tabId } });
-        this.discardEventEmitter.dispatchEvent(event);
-      },
+      onCreated: tab => this.discard({ type: 'created', id: tab.id }),
+      onActivated: ({ tabId }) => this.discard({ type: 'activated', id: tabId }),
       onRemoved: (tabId, removeInfo) => {
         const { isWindowClosing } = removeInfo;
-        const event = new CustomEvent('discard', { detail: { type: 'removed', id: tabId, isWindowClosing } });
-        this.discardEventEmitter.dispatchEvent(event);
+        this.discard({ type: 'removed', id: tabId, isWindowClosing });
       },
       onUpdated: (tabId, change) => {
         // TODO: change, add args in addListener to listen to specific changes
-        if (change.audible) {
-          const event = new CustomEvent('discard', { detail: { type: 'updated', id: tabId } });
-          this.discardEventEmitter.dispatchEvent(event);
+        if (!change.audible) {
+          return;
         }
+        this.discard({ type: 'updated', id: tabId });
       },
-      onAttached: (tabId) => {
-        const event = new CustomEvent('discard', { detail: { type: 'attached', id: tabId } });
-        this.discardEventEmitter.dispatchEvent(event);
-      },
-      onDetached: (tabId) => {
-        const event = new CustomEvent('discard', { detail: { type: 'detached', id: tabId } });
-        this.discardEventEmitter.dispatchEvent(event);
-      },
+      onAttached: tabId => this.discard({ type: 'attached', id: tabId }),
+      onDetached: tabId => this.discard({ type: 'detached', id: tabId }),
     };
+  }
+
+  // Emits events that trigger this.config calls
+  discard(payload) {
+    const event = new CustomEvent('discard', { detail: payload });
+    this.discardEventEmitter.dispatchEvent(event);
   }
 
   handleAction(actionInfo) {
@@ -378,13 +370,12 @@ class TabSuspender {
           break;
         }
         case 'total-suspender-whitelist-domain': {
-          try {
-            const { origin } = (new URL(tab.url));
-            this._whitelistPatternsStrings.add(origin);
-            saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
-          } catch (e) {
-            this.console.log(e);
+          const { origin } = (new URL(tab.url));
+          if (origin === 'null') {
+            return;
           }
+          this._whitelistPatternsStrings.add(origin);
+          saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
           break;
         }
         case 'total-suspender-blacklist-page': {
@@ -393,13 +384,12 @@ class TabSuspender {
           break;
         }
         case 'total-suspender-blacklist-domain': {
-          try {
-            const { origin } = (new URL(tab.url));
-            this._blacklistPatternsStrings.add(origin);
-            saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
-          } catch (e) {
-            this.console.log(e);
+          const { origin } = (new URL(tab.url));
+          if (origin === 'null') {
+            return;
           }
+          this._blacklistPatternsStrings.add(origin);
+          saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
           break;
         }
         default:
@@ -422,8 +412,7 @@ class TabSuspender {
     browser.storage.onChanged.addListener(async () => {
       await this.updateConfig();
       this.generateAction();
-      const event = new CustomEvent('discard', { detail: { type: 'configChange' } });
-      this.discardEventEmitter.dispatchEvent(event);
+      this.discard({ type: 'configChange' });
     });
   }
 
