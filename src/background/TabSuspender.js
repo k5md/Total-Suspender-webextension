@@ -14,13 +14,6 @@ class TabSuspender {
     // only modifiedTabs are meant to be changed
     this.config = [
       {
-        id: '#input-disable-suspension',
-        action:
-          () => () => () => [], // just return empty modified tabs to prevent any further actions
-        isEnabled: value => typeof value === 'boolean' && value,
-        defaultValue: false,
-      },
-      {
         id: 'default',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => modifiedTabs
           .filter(tab => !tab.active && !tab.discarded)
@@ -39,19 +32,6 @@ class TabSuspender {
         },
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
-      },
-      {
-        id: '#input-suspend-threshold',
-        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
-          if (modifiedTabs.length < value) {
-            return [];
-          }
-          const rest = modifiedTabs.slice(0, modifiedTabs.length - value);
-          this.console.log('thresholding', modifiedTabs, rest);
-          return rest;
-        },
-        isEnabled: value => !Number.isNaN(value) && value > 0,
-        defaultValue: 1, // number of loaded tabs
       },
       {
         id: '#input-ignore-audible',
@@ -187,6 +167,19 @@ class TabSuspender {
         defaultValue: false,
       },
       {
+        id: '#input-suspend-threshold',
+        action: value => () => (rawTabs, modifiedTabs = rawTabs) => {
+          if (modifiedTabs.length < value) {
+            return [];
+          }
+          const rest = modifiedTabs.slice(0, modifiedTabs.length - value);
+          this.console.log('thresholding', modifiedTabs, rest);
+          return rest;
+        },
+        isEnabled: value => !Number.isNaN(value) && value > 0,
+        defaultValue: 1, // number of loaded tabs
+      },
+      {
         id: '#input-suspend-planned',
         action: () => () => (rawTabs, modifiedTabs = rawTabs) => {
           this.console.log('suspending on planned', modifiedTabs);
@@ -196,6 +189,13 @@ class TabSuspender {
           saveToStorage({ '#input-suspend-planned': false });
           return modifiedTabs;
         },
+        isEnabled: value => typeof value === 'boolean' && value,
+        defaultValue: false,
+      },
+      {
+        id: '#input-disable-suspension', // it should be placed before any automatic discard
+        action:
+          () => () => () => [], // just return empty modified tabs to prevent any further actions
         isEnabled: value => typeof value === 'boolean' && value,
         defaultValue: false,
       },
@@ -336,34 +336,73 @@ class TabSuspender {
     });
 
     browser.menus.create({
-      id: 'total-suspender-whitelist',
+      id: 'total-suspender-whitelist-page',
       title: 'Whitelist',
       contexts: ['tab'],
     });
 
     browser.menus.create({
-      id: 'total-suspender-blacklist',
+      id: 'total-suspender-whitelist-domain',
+      title: 'Whitelist domain',
+      contexts: ['tab'],
+    });
+
+    browser.menus.create({
+      id: 'total-suspender-blacklist-page',
       title: 'Blacklist',
       contexts: ['tab'],
     });
 
+    browser.menus.create({
+      id: 'total-suspender-blacklist-domain',
+      title: 'Blacklist domain',
+      contexts: ['tab'],
+    });
+
     browser.menus.onClicked.addListener((info, tab) => {
-      if (info.menuItemId === 'total-suspender-suspend') {
-        browser.tabs.discard(tab.id);
+      if (!(this._blacklistPatternsStrings instanceof Set)) {
+        this._blacklistPatternsStrings = new Set();
       }
-      if (info.menuItemId === 'total-suspender-whitelist') {
-        if (!(this._whitelistPatternsStrings instanceof Set)) {
-          this._whitelistPatternsStrings = new Set();
-        }
-        this._whitelistPatternsStrings.add(tab.url);
-        saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
+      if (!(this._whitelistPatternsStrings instanceof Set)) {
+        this._whitelistPatternsStrings = new Set();
       }
-      if (info.menuItemId === 'total-suspender-blacklist') {
-        if (!(this._blacklistPatternsStrings instanceof Set)) {
-          this._blacklistPatternsStrings = new Set();
+
+      switch (info.menuItemId) {
+        case 'total-suspender-suspend': {
+          browser.tabs.discard(tab.id);
+          break;
         }
-        this._blacklistPatternsStrings.add(tab.url);
-        saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
+        case 'total-suspender-whitelist-page': {
+          this._whitelistPatternsStrings.add(tab.url);
+          saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
+          break;
+        }
+        case 'total-suspender-whitelist-domain': {
+          try {
+            const { origin } = (new URL(tab.url));
+            this._whitelistPatternsStrings.add(origin);
+            saveToStorage({ '#input-whitelist-pattern': this._whitelistPatternsStrings });
+          } catch (e) {
+            this.console.log(e);
+          }
+          break;
+        }
+        case 'total-suspender-blacklist-page': {
+          this._blacklistPatternsStrings.add(tab.url);
+          saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
+          break;
+        }
+        case 'total-suspender-blacklist-domain': {
+          try {
+            const { origin } = (new URL(tab.url));
+            this._blacklistPatternsStrings.add(origin);
+            saveToStorage({ '#input-blacklist-pattern': this._blacklistPatternsStrings });
+          } catch (e) {
+            this.console.log(e);
+          }
+          break;
+        }
+        default:
       }
     });
   }
