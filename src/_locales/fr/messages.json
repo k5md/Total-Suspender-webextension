@@ -38,17 +38,17 @@
 
 
   "titleDisableSuspension": {
-    "message": "Suspension",
+    "message": "Suspension automatique",
     "description": "Le texte est préfixé au bouton bascule pour activer / désactiver la suspension des tabulations."
   },
 
   "toggleDisableSuspensionOn": {
-    "message": "Désactivé",
+    "message": "Désactivée",
     "description": "Texte affiché sur le bouton bascule lorsque la suspension est désactivée."
   },
 
   "toggleDisableSuspensionOff": {
-    "message": "Activé",
+    "message": "Activée",
     "description": "Texte affiché sur le bouton bascule lorsque la suspension est activée."
   },
 
@@ -140,7 +140,7 @@
   },
 
   "whitelistDescription": {
-    "message": "Les onglets contenant des URL contenant des modèles de cette liste ne seront jamais suspendus. Pour utiliser des expressions régulières prepend",
+    "message": "Les onglets dont les URL matchent avec des modèles de cette liste ne seront jamais suspendus. Pour utiliser des expressions régulières ajouter ",
     "description": "Description de la fonctionnalité de la liste blanche, suivie d'une balise de code"
   },
 
@@ -151,7 +151,7 @@
   },
 
   "blacklistDescription": {
-    "message": "Seuls les onglets contenant des URL contenant des modèles de cette liste seront suspendus. Une liste vide équivaut à avoir \"Liste noire: off\". Pour utiliser des expressions régulières prepend",
+    "message": "Seuls les onglets dont les URL matchent avec des modèles de cette liste seront suspendus. Une liste vide équivaut à avoir \"Liste noire: off\". Pour utiliser des expressions régulières ajouter ",
     "description": "Description de la fonctionnalité de liste noire, suivie d'une balise de code."
   }
 }
