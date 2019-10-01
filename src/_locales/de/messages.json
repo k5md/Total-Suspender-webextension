@@ -1,0 +1,157 @@
+{
+  "extensionDescription": {
+    "message": "Eine minimalistische Erweiterung für Firefox welches nativ (mit tabs.discard) alle inaktiven Tabs auslagert und benötige nur minimale Add-on Berechtigungen um seine Einstellungen zu speicher und URLs zu filtern.",
+    "description": "Description of the extension."
+  },
+
+
+  "toggleDefaultOn": {
+    "message": "An",
+    "description": "Text displayed on toggle buttons if not specified (enabled state)."
+  },
+
+  "toggleDefaultOff": {
+    "message": "Aus",
+    "description": "Text displayed on toggle buttons if not specified (disabled state)."
+  },
+
+
+  "titleSettings": {
+    "message": "Einstellungen",
+    "description": "Settings navigation item title."
+  },
+
+  "titleActions": {
+    "message": "Aktionen",
+    "description": "Actions navigation item title."
+  },
+
+  "titleWhitelist": {
+    "message": "Whitelist",
+    "description": "Whitelist navigation item title."
+  },
+
+  "titleBlacklist": {
+    "message": "Blacklist",
+    "description": "Blacklist navigation item title."
+  },
+
+
+  "titleDisableSuspension": {
+    "message": "Auslagerung",
+    "description": "Text prepended to toggle button to enable/disable tabs suspension."
+  },
+
+  "toggleDisableSuspensionOn": {
+    "message": "Deaktiviert",
+    "description": "Text displayed on the toggle button when suspension is disabled."
+  },
+
+  "toggleDisableSuspensionOff": {
+    "message": "Aktiviert",
+    "description": "Text displayed on the toggle button when suspension is enabled."
+  },
+
+  "titleDelaySuspend": {
+    "message": "Sekunden bis zum auslagern",
+    "description": "Text prepended to the input element, specifying for how long a tab should be inactive to be suspended."
+  },
+
+  "titleIgnoreAudible": {
+    "message": "Tabs mit Tonausgabe ignorieren",
+    "description": "Text prepended to the toggle button, specifying, whether the tabs, playing sound should be suspended."
+  },
+
+  "titleIgnorePinned": {
+    "message": "Angehefte Tabs ignorieren",
+    "description": "Text prepended to the toggle button, specifying, if pinned tabs should be suspended."
+  },
+
+  "titleSuspendThreshold": {
+    "message": "Auslagern wenn über diese Anzahl Tabs",
+    "description": "Text prepended to the input element, specifying how many active tabs can exist before suspension starts."
+  },
+
+  "toggleSuspendPlannedOn": {
+    "message": "Lagere Tabs aus..",
+    "description": "Text on toggle button indicating being in the process of suspending (enabled state)."
+  },
+
+  "toggleSuspendPlannedOff": {
+    "message": "Jetzt auslagern wenn Kriterium erfüllt",
+    "description": "Text on toggle button to suspend tabs according to the settings set (disabled state)."
+  },
+
+  "toggleSuspendAllPlannedOn": {
+    "message": "Lagere Tabs aus..",
+    "description": "Text on toggle button indicating being in the process of suspending (enabled state)."
+  },
+
+  "toggleSuspendAllPlannedOff": {
+    "message": "Jetzt alle Tabs auslagern",
+    "description": "Text on toggle button to suspend tabs disregard the settings (disabled state)."
+  },
+
+
+  "titleAddURL": {
+    "message": "URL",
+    "description": "Text prepended to the input element to add URL to a generic list"
+  },
+
+  "buttonAddEntry": {
+    "message": "Hinzufügen",
+    "description": "Text on button to add generic list entry."
+  },
+
+  "buttonEditEntry": {
+    "message": "Bearbeiten",
+    "description": "Text on button to edit generic list entry."
+  },
+
+  "buttonDeleteEntry": {
+    "message": "Löschen",
+    "description": "Text on button to delete generic list entry."
+  },
+
+  "buttonConfirmEditEntry": {
+    "message": "Bestätigen",
+    "description": "Text on button to submit changes to an already existing generic list entry."
+  },
+
+  "buttonExportList": {
+    "message": "Exportieren",
+    "description": "Text on button to export list data to a text file."
+  },
+
+  "buttonImportList": {
+    "message": "Importieren",
+    "description": "Text on button to import list data from file."
+  },
+
+  "buttonClearList": {
+    "message": "Liste löschen",
+    "description": "Text on button to delete all generic list entries."
+  },
+
+
+  "titleEnableWhitelist": {
+    "message": "Whitelist",
+    "description": "Text prepended to toggle button to enable/disable whitelist."
+  },
+
+  "whitelistDescription": {
+    "message": "Tabs mit URLs die dieses Muster enthalten, werden niemals ausgelagert. Um regüläre Ausdrücke zu verwenden schreibe ",
+    "description": "Whitelisting functionality description, followed by code tag"
+  },
+
+
+  "titleEnableBlacklist": {
+    "message": "Blacklist",
+    "description": "Text prepended to toggle button to enable/disable blacklist."
+  },
+
+  "blacklistDescription": {
+    "message": "Tabs mit URLs die dieses Muster enthalten, werden ausgelagert. Eine leere Liste ist gleich mit 'Blacklist: aus'. Um regüläre Ausdrücke zu verwenden schreibe ",
+    "description": "Blacklisting functionality description, followed by code tag."
+  }
+}
