@@ -1,0 +1,127 @@
+{
+  "extensionDescription": {
+    "message": "Минималистичный аддон, который позволяет нативно выгружать неактивные вкладки из памяти по правилам."
+  },
+
+
+  "toggleDefaultOn": {
+    "message": "Включено"
+  },
+
+  "toggleDefaultOff": {
+    "message": "Отключено"
+  },
+
+
+  "titleSettings": {
+    "message": "Настройки"
+  },
+
+  "titleActions": {
+    "message": "Действия"
+  },
+
+  "titleWhitelist": {
+    "message": "Белый список"
+  },
+
+  "titleBlacklist": {
+    "message": "Чёрный список"
+  },
+
+
+  "titleDisableSuspension": {
+    "message": "Выгружать вкладки из памяти"
+  },
+
+  "toggleDisableSuspensionOn": {
+    "message": "Отключено"
+  },
+
+  "toggleDisableSuspensionOff": {
+    "message": "Включено"
+  },
+
+  "titleDelaySuspend": {
+    "message": "Отложить выгрузку (в секундах)"
+  },
+
+  "titleIgnoreAudible": {
+    "message": "Не выгружать вкладки со звуком"
+  },
+
+  "titleIgnorePinned": {
+    "message": "Не выгружать закреплённые вкладки"
+  },
+
+  "titleSuspendThreshold": {
+    "message": "Выгружать, когда вкладок не меньше"
+  },
+
+  "toggleSuspendPlannedOn": {
+    "message": "В процессе..."
+  },
+
+  "toggleSuspendPlannedOff": {
+    "message": "Выгрузить соответствующие правилам"
+  },
+
+  "toggleSuspendAllPlannedOn": {
+    "message": "В процессе..."
+  },
+
+  "toggleSuspendAllPlannedOff": {
+    "message": "Выгрузить все"
+  },
+
+
+  "titleAddURL": {
+    "message": "URL"
+  },
+
+  "buttonAddEntry": {
+    "message": "Добавить"
+  },
+
+  "buttonEditEntry": {
+    "message": "Изменить"
+  },
+
+  "buttonDeleteEntry": {
+    "message": "Удалить"
+  },
+
+  "buttonConfirmEditEntry": {
+    "message": "Сохранить"
+  },
+
+  "buttonExportList": {
+    "message": "Экспортировать"
+  },
+
+  "buttonImportList": {
+    "message": "Импортировать"
+  },
+
+  "buttonClearList": {
+    "message": "Очистить"
+  },
+
+
+  "titleEnableWhitelist": {
+    "message": "Использовать белый список"
+  },
+
+  "whitelistDescription": {
+    "message": "Вкладки, URL которых содержат паттерны из этого списка, не будут выгружены. Для регулярных выражений, добавьте перед выражением "
+  },
+
+
+  "titleEnableBlacklist": {
+    "message": "Использовать чёрный список"
+  },
+
+  "blacklistDescription": {
+    "message": "Будут выгружены только вкладки, URL которых содержат паттерны из этого списка. Для регулярных выражений, добавьте перед выражением "
+  }
+}
