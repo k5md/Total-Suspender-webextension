@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import './index.scss';
 
 const purposes = {
   primary: 'btn-outline-primary',
@@ -19,7 +20,7 @@ const FileImportButton = () => {
     }) => (
       <div>
         <label
-          className={`btn ${purposes[purpose] || purposes.primary}`}
+          className={`btn ${purposes[purpose] || purposes.primary} file_input__label`}
           for={id}
         >
          {title}

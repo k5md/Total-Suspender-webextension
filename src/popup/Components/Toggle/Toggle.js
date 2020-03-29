@@ -21,7 +21,7 @@ const Toggle = {
   }) => (
     <div className="input-group d-flex justify-content-between mb-4">
       {title && (
-        <div className="input-group-prepend">
+        <div>
           <span className="input-group-text">{title}</span>
         </div>
       )}
