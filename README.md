@@ -5,7 +5,7 @@
 
 A not-so-minimalistic web extension for Firefox that suspends natively (with tabs.discard) not-active tabs.
 
-[Addon page on mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/total-suspender/)
+[Addon page on mozilla.org](https://addons.mozilla.org/firefox/addon/total-suspender/)
 
 ## Features
 
@@ -27,7 +27,7 @@ A not-so-minimalistic web extension for Firefox that suspends natively (with tab
 
    `make build-prod` to build for production
 
-   `make pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
+   `make pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
 Building has been tested with:
 - Node.js version [11.15.0](https://nodejs.org/download/release/v11.15.0/)
@@ -43,7 +43,7 @@ Building has been tested with:
 
    `npm run build-prod` to build for production
 
-   `npm run pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/ru/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
+   `npm run pack` to build production version and pack it with [web-ext](https://developer.mozilla.org/docs/Mozilla/Add-ons/WebExtensions/Getting_started_with_web-ext)
 
 Building has been tested with:
 - Node.js version [10.13.0](https://nodejs.org/download/release/v10.13.0/)
